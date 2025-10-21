@@ -1,10 +1,10 @@
-
 <!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Монетный Кликер</title>
+    <title>Игра для Меллстроя</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🪙</text></svg>">
     <style>
         * {
             margin: 0;
@@ -12,301 +12,316 @@
             box-sizing: border-box;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
-        
+
         body {
             background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+            color: white;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
             align-items: center;
             padding: 20px;
-            color: white;
+            overflow-x: hidden;
+        }
+
+        .header {
             text-align: center;
-        }
-        
-        .container {
-            max-width: 800px;
+            margin-bottom: 30px;
             width: 100%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
         }
-        
-        header {
-            margin-bottom: 40px;
-            width: 100%;
-            padding: 20px;
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 15px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-        }
-        
-        h1 {
-            font-size: 2.5rem;
-            margin-bottom: 10px;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-        }
-        
+
         .balance-container {
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(0, 0, 0, 0.5);
             padding: 15px 30px;
-            border-radius: 10px;
-            margin-top: 15px;
+            border-radius: 50px;
             display: inline-block;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
         }
-        
-        #balance {
-            font-size: 2.2rem;
+
+        .balance {
+            font-size: 2.5rem;
             font-weight: bold;
-            color: #FFD700;
-            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7);
+            text-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
         }
-        
+
         .coin-container {
-            margin: 30px 0;
-            position: relative;
+            margin: 40px 0;
+            perspective: 1000px;
+            cursor: pointer;
         }
-        
+
         .coin {
             width: 200px;
             height: 200px;
-            background: radial-gradient(circle at 30% 30%, #FFD700, #D4AF37);
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            cursor: pointer;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
-            transition: transform 0.1s;
-            border: 8px solid #B8860B;
             position: relative;
-            overflow: hidden;
+            transform-style: preserve-3d;
+            transition: transform 0.3s ease;
         }
-        
-        .coin:before {
-            content: "";
+
+        .coin:hover {
+            transform: rotateY(10deg) rotateX(5deg);
+        }
+
+        .coin:active {
+            transform: scale(0.95) rotateY(5deg);
+        }
+
+        .coin-front, .coin-back {
             position: absolute;
             width: 100%;
             height: 100%;
-            background: radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.4), transparent 70%);
-        }
-        
-        .coin-inner {
-            width: 160px;
-            height: 160px;
-            background: radial-gradient(circle at 30% 30%, #FFD700, #D4AF37);
             border-radius: 50%;
+            backface-visibility: hidden;
             display: flex;
             justify-content: center;
             align-items: center;
-            border: 4px solid #B8860B;
-            box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
         }
-        
-        .coin-text {
-            font-size: 2rem;
-            font-weight: bold;
-            color: #8B6914;
+
+        .coin-front {
+            background: radial-gradient(circle at 30% 30%, #ffd700, #daa520);
+            transform: rotateY(0deg);
+        }
+
+        .coin-back {
+            background: radial-gradient(circle at 30% 30%, #daa520, #b8860b);
+            transform: rotateY(180deg);
+        }
+
+        .coin-center {
+            width: 60%;
+            height: 60%;
+            border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, #ffd700, #b8860b);
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 3rem;
+            color: #8b6914;
             text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.5);
         }
-        
-        .coin.clicked {
-            animation: coinClick 0.2s;
-        }
-        
-        @keyframes coinClick {
-            0% { transform: scale(1) rotate(0deg); }
-            50% { transform: scale(0.9) rotate(5deg); }
-            100% { transform: scale(1) rotate(0deg); }
-        }
-        
-        .stats {
-            background: rgba(255, 255, 255, 0.1);
+
+        .bottom-panel {
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 20px;
             padding: 20px;
-            border-radius: 15px;
-            margin-top: 30px;
-            width: 100%;
+            width: 90%;
             max-width: 500px;
+            display: flex;
+            justify-content: space-around;
+            margin-top: auto;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
         }
-        
-        .stats h2 {
-            margin-bottom: 15px;
-            font-size: 1.5rem;
-        }
-        
-        .stats p {
-            margin: 8px 0;
+
+        .btn {
+            background: linear-gradient(to bottom, #4a4a4a, #2a2a2a);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 10px;
             font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
         }
-        
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+            background: linear-gradient(to bottom, #5a5a5a, #3a3a3a);
+        }
+
+        .btn:active {
+            transform: translateY(1px);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
         .click-effect {
             position: absolute;
-            width: 30px;
-            height: 30px;
-            background: rgba(255, 255, 255, 0.7);
+            width: 50px;
+            height: 50px;
+            background: radial-gradient(circle, rgba(255,215,0,0.8) 0%, rgba(255,215,0,0) 70%);
             border-radius: 50%;
             pointer-events: none;
-            animation: clickAnimation 0.5s forwards;
+            animation: click-animation 0.5s forwards;
         }
-        
-        @keyframes clickAnimation {
+
+        @keyframes click-animation {
             0% {
-                transform: scale(0);
+                transform: scale(0.5);
                 opacity: 1;
             }
             100% {
-                transform: scale(3);
+                transform: scale(2);
                 opacity: 0;
             }
         }
-        
-        footer {
-            margin-top: 40px;
-            font-size: 0.9rem;
-            color: rgba(255, 255, 255, 0.7);
+
+        .stats {
+            margin-top: 20px;
+            text-align: center;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 10px 20px;
+            border-radius: 10px;
         }
-        
+
+        h1 {
+            margin-bottom: 10px;
+            text-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+        }
+
         @media (max-width: 600px) {
             .coin {
                 width: 150px;
                 height: 150px;
             }
             
-            .coin-inner {
-                width: 120px;
-                height: 120px;
-            }
-            
-            h1 {
+            .balance {
                 font-size: 2rem;
             }
             
-            #balance {
-                font-size: 1.8rem;
+            .btn {
+                padding: 10px 20px;
+                font-size: 1rem;
             }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>Монетный Кликер</h1>
-            <div class="balance-container">
-                <span>Баланс: </span>
-                <span id="balance">0</span>
-                <span> монет</span>
+    <div class="header">
+        <h1>Игра для Меллстроя</h1>
+        <div class="balance-container">
+            <div class="balance" id="balance">0</div>
+        </div>
+    </div>
+
+    <div class="coin-container">
+        <div class="coin" id="coin">
+            <div class="coin-front">
+                <div class="coin-center">$</div>
             </div>
-        </header>
-        
-        <div class="coin-container">
-            <div class="coin" id="coin">
-                <div class="coin-inner">
-                    <div class="coin-text">$</div>
-                </div>
+            <div class="coin-back">
+                <div class="coin-center">$</div>
             </div>
         </div>
-        
-        <div class="stats">
-            <h2>Статистика</h2>
-            <p>Кликов в секунду: <span id="cps">0</span></p>
-            <p>Всего кликов: <span id="total-clicks">0</span></p>
-            <p>Время игры: <span id="game-time">0</span> сек</p>
-        </div>
-        
-        <footer>
-            Нажимайте на монету, чтобы зарабатывать!
-        </footer>
+    </div>
+
+    <div class="stats">
+        <p>Кликов в секунду: <span id="cps">0</span></p>
+    </div>
+
+    <div class="bottom-panel">
+        <button class="btn" id="shop-btn">Магазин</button>
+        <button class="btn" id="settings-btn">Настройки</button>
     </div>
 
     <script>
-        // Элементы DOM
+        // Получаем элементы
         const balanceElement = document.getElementById('balance');
         const coinElement = document.getElementById('coin');
         const cpsElement = document.getElementById('cps');
-        const totalClicksElement = document.getElementById('total-clicks');
-        const gameTimeElement = document.getElementById('game-time');
-        
-        // Переменные игры
-        let balance = 0;
-        let totalClicks = 0;
+        const shopBtn = document.getElementById('shop-btn');
+        const settingsBtn = document.getElementById('settings-btn');
+
+        // Загружаем баланс из localStorage или устанавливаем 0
+        let balance = parseInt(localStorage.getItem('clickerBalance')) || 0;
+        let clickCount = 0;
         let startTime = Date.now();
-        let clicksLastSecond = 0;
-        let lastClickTime = Date.now();
-        
-        // Обновление статистики каждую секунду
-        setInterval(() => {
-            const currentTime = Date.now();
-            const elapsedTime = Math.floor((currentTime - startTime) / 1000);
-            gameTimeElement.textContent = elapsedTime;
-            
-            // Расчет кликов в секунду
-            if (currentTime - lastClickTime > 1000) {
-                clicksLastSecond = 0;
-            }
-            cpsElement.textContent = clicksLastSecond;
-        }, 1000);
-        
-        // Обработчик клика по монете
-        coinElement.addEventListener('click', (e) => {
-            // Увеличиваем баланс и счетчики
-            balance++;
-            totalClicks++;
-            clicksLastSecond++;
-            
-            // Обновляем отображение
-            balanceElement.textContent = balance;
-            totalClicksElement.textContent = totalClicks;
-            lastClickTime = Date.now();
-            
-            // Анимация монеты
-            coinElement.classList.add('clicked');
-            setTimeout(() => {
-                coinElement.classList.remove('clicked');
-            }, 200);
-            
-            // Создаем эффект клика
-            createClickEffect(e);
-        });
-        
-        // Функция создания эффекта клика
-        function createClickEffect(e) {
+        let cps = 0;
+
+        // Обновляем отображение баланса
+        function updateBalance() {
+            balanceElement.textContent = balance.toLocaleString();
+        }
+
+        // Функция для создания эффекта клика
+        function createClickEffect(x, y) {
             const effect = document.createElement('div');
             effect.className = 'click-effect';
+            effect.style.left = `${x - 25}px`;
+            effect.style.top = `${y - 25}px`;
+            document.body.appendChild(effect);
             
-            const rect = coinElement.getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            const y = e.clientY - rect.top;
-            
-            effect.style.left = `${x}px`;
-            effect.style.top = `${y}px`;
-            
-            coinElement.appendChild(effect);
-            
+            // Удаляем эффект после завершения анимации
             setTimeout(() => {
                 effect.remove();
             }, 500);
         }
-        
-        // Авто-кликер (бонусная функция)
-        let autoClickerActive = false;
-        let autoClickerInterval;
-        
-        // Активируем авто-кликер после 50 кликов
-        function checkAutoClicker() {
-            if (totalClicks >= 50 && !autoClickerActive) {
-                autoClickerActive = true;
-                autoClickerInterval = setInterval(() => {
-                    balance++;
-                    balanceElement.textContent = balance;
-                }, 1000);
+
+        // Обработчик клика по монете
+        coinElement.addEventListener('click', (e) => {
+            // Увеличиваем баланс
+            balance++;
+            clickCount++;
+            
+            // Сохраняем баланс в localStorage
+            localStorage.setItem('clickerBalance', balance);
+            
+            // Обновляем отображение
+            updateBalance();
+            
+            // Создаем эффект клика
+            createClickEffect(e.clientX, e.clientY);
+            
+            // Анимация монеты
+            coinElement.style.transform = 'scale(0.95) rotateY(5deg)';
+            setTimeout(() => {
+                coinElement.style.transform = '';
+            }, 100);
+        });
+
+        // Обработчик движения мыши для эффекта наведения
+        document.addEventListener('mousemove', (e) => {
+            const coinRect = coinElement.getBoundingClientRect();
+            const coinCenterX = coinRect.left + coinRect.width / 2;
+            const coinCenterY = coinRect.top + coinRect.height / 2;
+            
+            const deltaX = (e.clientX - coinCenterX) / 50;
+            const deltaY = (e.clientY - coinCenterY) / 50;
+            
+            coinElement.style.transform = `rotateY(${deltaX}deg) rotateX(${-deltaY}deg)`;
+        });
+
+        // Обработчик выхода мыши за пределы монеты
+        coinElement.addEventListener('mouseleave', () => {
+            coinElement.style.transform = '';
+        });
+
+        // Расчет кликов в секунду
+        function calculateCPS() {
+            const currentTime = Date.now();
+            const elapsedTime = (currentTime - startTime) / 1000; // в секундах
+            
+            if (elapsedTime >= 1) {
+                cps = clickCount / elapsedTime;
+                cpsElement.textContent = cps.toFixed(1);
                 
-                // Показываем сообщение о разблокировке авто-кликера
-                alert('Поздравляем! Вы разблокировали авто-кликер! Теперь вы получаете 1 монету в секунду автоматически.');
+                // Сбрасываем счетчик и время для следующего интервала
+                clickCount = 0;
+                startTime = currentTime;
             }
+            
+            requestAnimationFrame(calculateCPS);
         }
-        
-        // Проверяем авто-кликер при каждом клике
-        coinElement.addEventListener('click', checkAutoClicker);
+
+        // Запускаем расчет CPS
+        calculateCPS();
+
+        // Инициализация
+        updateBalance();
+
+        // Обработчики кнопок (пока только заглушки)
+        shopBtn.addEventListener('click', () => {
+            alert('Магазин скоро будет доступен!');
+        });
+
+        settingsBtn.addEventListener('click', () => {
+            alert('Настройки скоро будут доступны!');
+        });
     </script>
 </body>
 </html>
