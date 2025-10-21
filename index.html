@@ -20,14 +20,13 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
             padding: 20px;
             overflow-x: hidden;
         }
 
         .header {
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 20px;
             width: 100%;
         }
 
@@ -46,8 +45,17 @@
             text-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
         }
 
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            flex-grow: 1;
+            width: 100%;
+        }
+
         .coin-container {
-            margin: 40px 0;
+            margin: 20px 0;
             perspective: 1000px;
             cursor: pointer;
         }
@@ -234,8 +242,8 @@
             }
         }
 
-        /* Стили для модального окна настроек */
-        .settings-modal {
+        /* Стили для модальных окон */
+        .modal {
             position: fixed;
             top: 0;
             left: 0;
@@ -251,12 +259,12 @@
             z-index: 1000;
         }
 
-        .settings-modal.active {
+        .modal.active {
             opacity: 1;
             visibility: visible;
         }
 
-        .settings-content {
+        .modal-content {
             background: linear-gradient(135deg, #2a2a4a, #1a1a3a);
             border-radius: 20px;
             padding: 30px;
@@ -266,13 +274,15 @@
             transform: translateY(-50px);
             transition: transform 0.3s ease;
             border: 1px solid rgba(255, 255, 255, 0.1);
+            max-height: 80vh;
+            overflow-y: auto;
         }
 
-        .settings-modal.active .settings-content {
+        .modal.active .modal-content {
             transform: translateY(0);
         }
 
-        .settings-header {
+        .modal-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -281,7 +291,7 @@
             padding-bottom: 15px;
         }
 
-        .settings-title {
+        .modal-title {
             font-size: 1.8rem;
             font-weight: bold;
             color: #fff;
@@ -403,6 +413,76 @@
             transform: translateY(-2px);
         }
 
+        /* Стили для магазина */
+        .shop-item {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 15px;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        .shop-item:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-3px);
+        }
+
+        .shop-item-info {
+            flex-grow: 1;
+        }
+
+        .shop-item-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .shop-item-description {
+            font-size: 0.9rem;
+            color: #ccc;
+            margin-bottom: 8px;
+        }
+
+        .shop-item-price {
+            font-size: 1.1rem;
+            color: #ffd700;
+            font-weight: bold;
+        }
+
+        .shop-item-btn {
+            background: linear-gradient(135deg, #4facfe, #00f2fe);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+        }
+
+        .shop-item-btn:hover:not(:disabled) {
+            background: linear-gradient(135deg, #3a9dfc, #00d9fe);
+            transform: translateY(-2px);
+        }
+
+        .shop-item-btn:disabled {
+            background: #666;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        .owned-badge {
+            background: #4CAF50;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 10px;
+            font-size: 0.8rem;
+            margin-left: 10px;
+        }
+
         @media (max-width: 600px) {
             .coin {
                 width: 150px;
@@ -422,8 +502,18 @@
                 padding: 20px;
             }
             
-            .settings-content {
+            .modal-content {
                 padding: 20px;
+            }
+            
+            .shop-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .shop-item-btn {
+                margin-top: 10px;
+                width: 100%;
             }
         }
     </style>
@@ -436,13 +526,15 @@
         </div>
     </div>
 
-    <div class="coin-container">
-        <div class="coin" id="coin">
-            <div class="coin-front">
-                <img src="logo.png" alt="Монета" class="coin-image">
-            </div>
-            <div class="coin-back">
-                <img src="logo.png" alt="Монета" class="coin-image">
+    <div class="main-content">
+        <div class="coin-container">
+            <div class="coin" id="coin">
+                <div class="coin-front">
+                    <img src="logo.png" alt="Монета" class="coin-image">
+                </div>
+                <div class="coin-back">
+                    <img src="logo.png" alt="Монета" class="coin-image">
+                </div>
             </div>
         </div>
     </div>
@@ -457,10 +549,10 @@
     </div>
 
     <!-- Модальное окно настроек -->
-    <div class="settings-modal" id="settings-modal">
-        <div class="settings-content">
-            <div class="settings-header">
-                <h2 class="settings-title">Настройки</h2>
+    <div class="modal" id="settings-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Настройки</h2>
                 <button class="close-btn" id="close-settings">
                     <i class="fas fa-times"></i>
                 </button>
@@ -523,6 +615,22 @@
         </div>
     </div>
 
+    <!-- Модальное окно магазина -->
+    <div class="modal" id="shop-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Магазин улучшений</h2>
+                <button class="close-btn" id="close-shop">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="shop-items" id="shop-items">
+                <!-- Товары будут добавляться через JavaScript -->
+            </div>
+        </div>
+    </div>
+
     <div class="particles-container" id="particles"></div>
 
     <script>
@@ -533,11 +641,22 @@
         const settingsBtn = document.getElementById('settings-btn');
         const particlesContainer = document.getElementById('particles');
         const settingsModal = document.getElementById('settings-modal');
+        const shopModal = document.getElementById('shop-modal');
         const closeSettingsBtn = document.getElementById('close-settings');
+        const closeShopBtn = document.getElementById('close-shop');
         const resetBtn = document.getElementById('reset-btn');
+        const shopItemsContainer = document.getElementById('shop-items');
 
-        // Загружаем баланс из localStorage или устанавливаем 0
+        // Загружаем баланс и улучшения из localStorage
         let balance = parseInt(localStorage.getItem('clickerBalance')) || 0;
+        let upgrades = JSON.parse(localStorage.getItem('clickerUpgrades')) || {
+            autoClicker: { level: 0, cost: 50, autoClicks: 0 },
+            doubleClick: { level: 0, cost: 100, multiplier: 1 },
+            goldenClick: { level: 0, cost: 200, chance: 0 }
+        };
+
+        // Автокликер
+        let autoClickInterval;
 
         // Обновляем отображение баланса
         function updateBalance() {
@@ -573,8 +692,20 @@
 
         // Обработчик клика по монете
         coinElement.addEventListener('click', (e) => {
+            // Базовый клик
+            let clickValue = 1;
+            
+            // Умножаем на множитель двойного клика
+            clickValue *= upgrades.doubleClick.multiplier;
+            
+            // Шанс золотого клика
+            if (Math.random() < upgrades.goldenClick.chance) {
+                clickValue *= 5;
+                createClickEffect(e.clientX, e.clientY, true);
+            }
+            
             // Увеличиваем баланс
-            balance++;
+            balance += clickValue;
             
             // Сохраняем баланс в localStorage
             localStorage.setItem('clickerBalance', balance);
@@ -591,6 +722,25 @@
                 coinElement.style.transform = '';
             }, 100);
         });
+
+        // Функция автокликера
+        function startAutoClicker() {
+            if (autoClickInterval) clearInterval(autoClickInterval);
+            
+            autoClickInterval = setInterval(() => {
+                if (upgrades.autoClicker.autoClicks > 0) {
+                    balance += upgrades.autoClicker.autoClicks;
+                    localStorage.setItem('clickerBalance', balance);
+                    updateBalance();
+                    
+                    // Создаем эффект автоклика
+                    const coinRect = coinElement.getBoundingClientRect();
+                    const x = coinRect.left + coinRect.width / 2;
+                    const y = coinRect.top + coinRect.height / 2;
+                    createClickEffect(x, y);
+                }
+            }, 1000);
+        }
 
         // Обработчик движения мыши для эффекта наведения
         document.addEventListener('mousemove', (e) => {
@@ -609,20 +759,35 @@
             coinElement.style.transform = '';
         });
 
-        // Открытие модального окна настроек
+        // Открытие модальных окон
         settingsBtn.addEventListener('click', () => {
             settingsModal.classList.add('active');
         });
 
-        // Закрытие модального окна настроек
+        shopBtn.addEventListener('click', () => {
+            shopModal.classList.add('active');
+            renderShopItems();
+        });
+
+        // Закрытие модальных окон
         closeSettingsBtn.addEventListener('click', () => {
             settingsModal.classList.remove('active');
         });
 
-        // Закрытие модального окна при клике вне его
+        closeShopBtn.addEventListener('click', () => {
+            shopModal.classList.remove('active');
+        });
+
+        // Закрытие модальных окон при клике вне их
         settingsModal.addEventListener('click', (e) => {
             if (e.target === settingsModal) {
                 settingsModal.classList.remove('active');
+            }
+        });
+
+        shopModal.addEventListener('click', (e) => {
+            if (e.target === shopModal) {
+                shopModal.classList.remove('active');
             }
         });
 
@@ -630,21 +795,146 @@
         resetBtn.addEventListener('click', () => {
             if (confirm('Вы уверены, что хотите сбросить весь прогресс? Это действие нельзя отменить.')) {
                 balance = 0;
+                upgrades = {
+                    autoClicker: { level: 0, cost: 50, autoClicks: 0 },
+                    doubleClick: { level: 0, cost: 100, multiplier: 1 },
+                    goldenClick: { level: 0, cost: 200, chance: 0 }
+                };
                 localStorage.setItem('clickerBalance', balance);
+                localStorage.setItem('clickerUpgrades', JSON.stringify(upgrades));
                 updateBalance();
+                startAutoClicker();
                 settingsModal.classList.remove('active');
                 alert('Прогресс сброшен!');
             }
         });
 
+        // Функция рендера товаров в магазине
+        function renderShopItems() {
+            shopItemsContainer.innerHTML = '';
+            
+            const shopItems = [
+                {
+                    id: 'autoClicker',
+                    title: 'Авто-кликер',
+                    description: 'Автоматически кликает за вас',
+                    baseCost: 50,
+                    level: upgrades.autoClicker.level,
+                    maxLevel: 10,
+                    getCost: function() {
+                        return Math.floor(this.baseCost * Math.pow(1.5, this.level));
+                    },
+                    effect: function() {
+                        return `+${this.level} кликов/сек`;
+                    },
+                    buy: function() {
+                        const cost = this.getCost();
+                        if (balance >= cost && this.level < this.maxLevel) {
+                            balance -= cost;
+                            this.level++;
+                            upgrades.autoClicker.level = this.level;
+                            upgrades.autoClicker.autoClicks = this.level;
+                            upgrades.autoClicker.cost = this.getCost();
+                            localStorage.setItem('clickerBalance', balance);
+                            localStorage.setItem('clickerUpgrades', JSON.stringify(upgrades));
+                            updateBalance();
+                            startAutoClicker();
+                            renderShopItems();
+                        }
+                    }
+                },
+                {
+                    id: 'doubleClick',
+                    title: 'Усилитель кликов',
+                    description: 'Увеличивает силу каждого клика',
+                    baseCost: 100,
+                    level: upgrades.doubleClick.level,
+                    maxLevel: 5,
+                    getCost: function() {
+                        return Math.floor(this.baseCost * Math.pow(2, this.level));
+                    },
+                    effect: function() {
+                        return `x${1 + this.level * 0.5} к кликам`;
+                    },
+                    buy: function() {
+                        const cost = this.getCost();
+                        if (balance >= cost && this.level < this.maxLevel) {
+                            balance -= cost;
+                            this.level++;
+                            upgrades.doubleClick.level = this.level;
+                            upgrades.doubleClick.multiplier = 1 + this.level * 0.5;
+                            upgrades.doubleClick.cost = this.getCost();
+                            localStorage.setItem('clickerBalance', balance);
+                            localStorage.setItem('clickerUpgrades', JSON.stringify(upgrades));
+                            updateBalance();
+                            renderShopItems();
+                        }
+                    }
+                },
+                {
+                    id: 'goldenClick',
+                    title: 'Золотой клик',
+                    description: 'Шанс получить 5x монет за клик',
+                    baseCost: 200,
+                    level: upgrades.goldenClick.level,
+                    maxLevel: 5,
+                    getCost: function() {
+                        return Math.floor(this.baseCost * Math.pow(2.5, this.level));
+                    },
+                    effect: function() {
+                        return `${this.level * 5}% шанс`;
+                    },
+                    buy: function() {
+                        const cost = this.getCost();
+                        if (balance >= cost && this.level < this.maxLevel) {
+                            balance -= cost;
+                            this.level++;
+                            upgrades.goldenClick.level = this.level;
+                            upgrades.goldenClick.chance = this.level * 0.05;
+                            upgrades.goldenClick.cost = this.getCost();
+                            localStorage.setItem('clickerBalance', balance);
+                            localStorage.setItem('clickerUpgrades', JSON.stringify(upgrades));
+                            updateBalance();
+                            renderShopItems();
+                        }
+                    }
+                }
+            ];
+            
+            shopItems.forEach(item => {
+                const shopItem = document.createElement('div');
+                shopItem.className = 'shop-item';
+                
+                const cost = item.getCost();
+                const canBuy = balance >= cost && item.level < item.maxLevel;
+                
+                shopItem.innerHTML = `
+                    <div class="shop-item-info">
+                        <div class="shop-item-title">${item.title} ${item.level > 0 ? `<span class="owned-badge">Ур. ${item.level}</span>` : ''}</div>
+                        <div class="shop-item-description">${item.description}</div>
+                        <div class="shop-item-effect">Эффект: ${item.effect()}</div>
+                        <div class="shop-item-price">Цена: ${cost} монет</div>
+                    </div>
+                    <button class="shop-item-btn" ${!canBuy ? 'disabled' : ''}>
+                        ${item.level >= item.maxLevel ? 'Макс. ур.' : 'Купить'}
+                    </button>
+                `;
+                
+                const buyBtn = shopItem.querySelector('.shop-item-btn');
+                if (item.level < item.maxLevel) {
+                    buyBtn.addEventListener('click', () => {
+                        item.buy();
+                    });
+                }
+                
+                shopItemsContainer.appendChild(shopItem);
+            });
+        }
+
         // Инициализация
         updateBalance();
         createParticles();
-
-        // Обработчик кнопки магазина (пока заглушка)
-        shopBtn.addEventListener('click', () => {
-            alert('Магазин скоро будет доступен!');
-        });
+        startAutoClicker();
     </script>
 </body>
 </html>
