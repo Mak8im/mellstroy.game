@@ -14,7 +14,7 @@
         }
 
         body {
-            background: linear-gradient(135deg, #0d1b4c, #8a1a1a, #d4941f);
+            background: linear-gradient(135deg, #2d1b69, #4a1e8c, #6a2cb2);
             color: white;
             min-height: 100vh;
             display: flex;
@@ -43,6 +43,12 @@
             font-size: 2.5rem;
             font-weight: bold;
             text-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+        }
+
+        .balance-symbol {
+            color: #ffd700;
+            font-size: 2rem;
+            margin-left: 5px;
         }
 
         .main-content {
@@ -218,11 +224,13 @@
 
         .particle {
             position: absolute;
-            width: 8px;
-            height: 8px;
-            background: rgba(255, 215, 0, 0.7);
-            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            background-image: url('chastica.png');
+            background-size: contain;
+            background-repeat: no-repeat;
             animation: float 15s infinite linear;
+            opacity: 0.7;
         }
 
         @keyframes float {
@@ -231,10 +239,10 @@
                 opacity: 0;
             }
             10% {
-                opacity: 1;
+                opacity: 0.7;
             }
             90% {
-                opacity: 1;
+                opacity: 0.7;
             }
             100% {
                 transform: translateY(-100px) rotate(360deg);
@@ -650,6 +658,11 @@
             .confirm-btn {
                 width: 100%;
             }
+            
+            .particle {
+                width: 30px;
+                height: 30px;
+            }
         }
 
         @media (max-width: 480px) {
@@ -677,6 +690,11 @@
             .shop-item-title {
                 font-size: 1.1rem;
             }
+            
+            .particle {
+                width: 25px;
+                height: 25px;
+            }
         }
 
         /* Отключение hover эффектов на тач-устройствах */
@@ -699,7 +717,7 @@
 <body>
     <div class="header">
         <div class="balance-container">
-            <div class="balance" id="balance">0</div>
+            <div class="balance" id="balance">0<span class="balance-symbol"> m$</span></div>
         </div>
     </div>
 
@@ -874,13 +892,12 @@
 
         // Функция для создания частиц
         function createParticles() {
-            for (let i = 0; i < 20; i++) {
+            for (let i = 0; i < 15; i++) {
                 const particle = document.createElement('div');
                 particle.className = 'particle';
                 particle.style.left = `${Math.random() * 100}vw`;
                 particle.style.animationDelay = `${Math.random() * 15}s`;
-                particle.style.width = `${Math.random() * 6 + 4}px`;
-                particle.style.height = particle.style.width;
+                particle.style.animationDuration = `${15 + Math.random() * 10}s`;
                 particlesContainer.appendChild(particle);
             }
         }
@@ -1061,7 +1078,7 @@
                         return Math.floor(this.baseCost * Math.pow(2, this.level));
                     },
                     effect: function() {
-                        return `x${1 + this.level * 0.5} к кликам`;
+                        return `x${1 + this.level} к кликам`;
                     },
                     buy: function() {
                         const cost = this.getCost();
@@ -1069,7 +1086,7 @@
                             balance -= cost;
                             this.level++;
                             upgrades.doubleClick.level = this.level;
-                            upgrades.doubleClick.multiplier = 1 + this.level * 0.5;
+                            upgrades.doubleClick.multiplier = 1 + this.level;
                             upgrades.doubleClick.cost = this.getCost();
                             localStorage.setItem('clickerBalance', balance);
                             localStorage.setItem('clickerUpgrades', JSON.stringify(upgrades));
@@ -1120,7 +1137,7 @@
                         <div class="shop-item-title">${item.title} ${item.level > 0 ? `<span class="owned-badge">Ур. ${item.level}</span>` : ''}</div>
                         <div class="shop-item-description">${item.description}</div>
                         <div class="shop-item-effect">Эффект: ${item.effect()}</div>
-                        <div class="shop-item-price">Цена: ${cost} монет</div>
+                        <div class="shop-item-price">Цена: ${cost} m$</div>
                     </div>
                     <button class="shop-item-btn" ${!canBuy ? 'disabled' : ''}>
                         ${item.level >= item.maxLevel ? 'Макс. ур.' : 'Купить'}
