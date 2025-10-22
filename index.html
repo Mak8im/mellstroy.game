@@ -123,7 +123,16 @@
             font-size: 2rem;
             font-weight: bold;
             color: #ffd700;
-            text-shadow: 0 0 10px rgba(255, 215, 0, 0.7);
+            text-shadow: 
+                2px 2px 0 #000,
+                -2px -2px 0 #000,
+                2px -2px 0 #000,
+                -2px 2px 0 #000,
+                0 2px 0 #000,
+                2px 0 0 #000,
+                0 -2px 0 #000,
+                -2px 0 0 #000,
+                2px 2px 5px #000;
             opacity: 0;
             animation: coin-float 1.5s ease-out forwards;
             pointer-events: none;
@@ -326,6 +335,25 @@
             border: 1px solid rgba(255, 255, 255, 0.1);
             max-height: 80vh;
             overflow-y: auto;
+        }
+
+        /* Кастомный скроллбар для модальных окон */
+        .modal-content::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .modal-content::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+        }
+
+        .modal-content::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #4facfe, #00f2fe);
+            border-radius: 4px;
+        }
+
+        .modal-content::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(135deg, #3a9dfc, #00d9fe);
         }
 
         .modal.active .modal-content {
