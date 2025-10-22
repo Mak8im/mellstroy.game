@@ -1,12 +1,11 @@
 <!DOCTYPE html>
-
 <html lang="ru">
 <head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Игра для Меллстроя</title>
-<link href="icon.ico" rel="icon" type="image/x-icon"/>
-<style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Игра для Меллстроя</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🪙</text></svg>">
+    <style>
         * {
             margin: 0;
             padding: 0;
@@ -283,12 +282,12 @@
 
         .particle {
             position: absolute;
-            width: 30px;
-            height: 30px;
+            width: 40px;
+            height: 40px;
             background-size: contain;
             background-repeat: no-repeat;
             animation: float 15s infinite linear;
-            opacity: 0.6;
+            opacity: 0.7;
         }
 
         .particle.type1 {
@@ -317,10 +316,10 @@
                 opacity: 0;
             }
             10% {
-                opacity: 0.6;
+                opacity: 0.7;
             }
             90% {
-                opacity: 0.6;
+                opacity: 0.7;
             }
             100% {
                 transform: translateY(-100px) rotate(360deg);
@@ -947,8 +946,8 @@
             }
             
             .particle {
-                width: 25px;
-                height: 25px;
+                width: 30px;
+                height: 30px;
             }
         }
 
@@ -979,8 +978,8 @@
             }
             
             .particle {
-                width: 20px;
-                height: 20px;
+                width: 25px;
+                height: 25px;
             }
         }
 
@@ -999,242 +998,781 @@
             }
         }
     </style>
-<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
-<div class="header">
-<div class="balance-container">
-<div class="balance" id="balance">0<span class="balance-symbol"> m$</span></div>
-<div class="rebirth-info" id="rebirth-info">Перерождения: 0 | Множитель: x1</div>
-</div>
-</div>
-<div class="main-content">
-<div class="coin-container">
-<div class="coin" id="coin">
-<div class="coin-front">
-<img alt="Монета" class="coin-image" src="logo.png"/>
-</div>
-<div class="coin-back">
-<img alt="Монета" class="coin-image" src="logo.png"/>
-</div>
-</div>
-</div>
-</div>
-<div class="bottom-panel">
-<button class="btn" id="shop-btn">
-<i class="fas fa-shopping-cart"></i> Магазин
-        </button>
-<button class="btn" id="rebirth-btn">
-<i class="fas fa-redo"></i> Перерождение
-        </button>
-<button class="btn" id="settings-btn">
-<i class="fas fa-cog"></i> Настройки
-        </button>
-</div>
-<!-- Модальное окно настроек -->
-<div class="modal" id="settings-modal">
-<div class="modal-content">
-<div class="modal-header">
-<h2 class="modal-title">Настройки</h2>
-<button class="close-btn" id="close-settings">
-<i class="fas fa-times"></i>
-</button>
-</div>
-<div class="settings-section">
-<h3 class="settings-section-title">Звук</h3>
-<div class="setting-item">
-<span class="setting-label">Звуки кликов</span>
-<label class="toggle-switch">
-<input checked="" id="sound-toggle" type="checkbox"/>
-<span class="slider"></span>
-</label>
-</div>
-<div class="setting-item">
-<span class="setting-label">Громкость</span>
-<input class="volume-slider" id="volume-slider" max="100" min="0" type="range" value="80"/>
-</div>
-</div>
-<div class="settings-section">
-<h3 class="settings-section-title">Внешний вид</h3>
-<div class="setting-item">
-<span class="setting-label">Темная тема</span>
-<label class="toggle-switch">
-<input checked="" id="theme-toggle" type="checkbox"/>
-<span class="slider"></span>
-</label>
-</div>
-<div class="setting-item">
-<span class="setting-label">Анимации</span>
-<label class="toggle-switch">
-<input checked="" id="animations-toggle" type="checkbox"/>
-<span class="slider"></span>
-</label>
-</div>
-</div>
-<div class="settings-section">
-<h3 class="settings-section-title">Игровой процесс</h3>
-<div class="setting-item">
-<span class="setting-label">Авто-кликер</span>
-<label class="toggle-switch">
-<input id="autoclicker-toggle" type="checkbox"/>
-<span class="slider"></span>
-</label>
-</div>
-<div class="setting-item">
-<span class="setting-label">Уведомления</span>
-<label class="toggle-switch">
-<input checked="" id="notifications-toggle" type="checkbox"/>
-<span class="slider"></span>
-</label>
-</div>
-</div>
-<button class="stats-btn" id="stats-btn">
-<i class="fas fa-chart-bar"></i> Статистика
-            </button>
-<button class="reset-btn" id="reset-btn">
-<i class="fas fa-redo"></i> Сбросить прогресс
-            </button>
-</div>
-</div>
-<!-- Модальное окно магазина -->
-<div class="modal" id="shop-modal">
-<div class="modal-content">
-<div class="modal-header">
-<h2 class="modal-title">Магазин улучшений</h2>
-<button class="close-btn" id="close-shop">
-<i class="fas fa-times"></i>
-</button>
-</div>
-<div class="shop-items" id="shop-items">
-<!-- Товары будут добавляться через JavaScript -->
-</div>
-</div>
-</div>
-<!-- Модальное окно статистики -->
-<div class="modal" id="stats-modal">
-<div class="modal-content">
-<div class="modal-header">
-<h2 class="modal-title">Статистика</h2>
-<button class="close-btn" id="close-stats">
-<i class="fas fa-times"></i>
-</button>
-</div>
-<div class="stats-section">
-<h3 class="settings-section-title">Общая статистика</h3>
-<div class="stats-item">
-<span class="stats-label">Всего кликов:</span>
-<span class="stats-value" id="total-clicks">0</span>
-</div>
-<div class="stats-item">
-<span class="stats-label">Всего заработано:</span>
-<span class="stats-value" id="total-earned">0 m$</span>
-</div>
-<div class="stats-item">
-<span class="stats-label">Время игры:</span>
-<span class="stats-value" id="play-time">0:00</span>
-</div>
-<div class="stats-item">
-<span class="stats-label">Кликов в секунду:</span>
-<span class="stats-value" id="clicks-per-second">0</span>
-</div>
-<div class="stats-item">
-<span class="stats-label">Перерождения:</span>
-<span class="stats-value" id="rebirth-count">0</span>
-</div>
-<div class="stats-item">
-<span class="stats-label">Общий множитель:</span>
-<span class="stats-value" id="total-multiplier">x1</span>
-</div>
-</div>
-<div class="stats-section">
-<h3 class="settings-section-title">Улучшения</h3>
-<div class="stats-item">
-<span class="stats-label">Уровень авто-кликера:</span>
-<span class="stats-value" id="autoclicker-level">0</span>
-</div>
-<div class="stats-item">
-<span class="stats-label">Множитель кликов:</span>
-<span class="stats-value" id="click-multiplier">x1</span>
-</div>
-<div class="stats-item">
-<span class="stats-label">Золотые клики:</span>
-<span class="stats-value" id="golden-clicks">0</span>
-</div>
-<div class="stats-item">
-<span class="stats-label">Уровень удачи:</span>
-<span class="stats-value" id="luck-level">0</span>
-</div>
-</div>
-<div class="stats-section">
-<h3 class="settings-section-title">Достижения</h3>
-<div class="stats-item">
-<span class="stats-label">Прогресс до 1M m$:</span>
-<span class="stats-value" id="progress-1m">0%</span>
-</div>
-<div class="stats-progress">
-<div class="stats-progress-bar" id="progress-bar-1m" style="width: 0%"></div>
-</div>
-</div>
-</div>
-</div>
-<!-- Модальное окно подтверждения сброса -->
-<div class="confirm-modal" id="confirm-modal">
-<div class="confirm-content">
-<div class="confirm-icon">
-<i class="fas fa-exclamation-triangle"></i>
-</div>
-<h2 class="confirm-title">Подтвердите действие</h2>
-<p class="confirm-message">Вы уверены, что хотите сбросить весь прогресс? Это действие нельзя отменить.</p>
-<div class="confirm-buttons">
-<button class="confirm-btn confirm-ok" id="confirm-ok">OK</button>
-<button class="confirm-btn confirm-cancel" id="confirm-cancel">Отмена</button>
-</div>
-</div>
-</div>
-<!-- Модальное окно перерождения -->
-<div class="rebirth-modal" id="rebirth-modal">
-<div class="rebirth-content">
-<div class="rebirth-icon">
-<i class="fas fa-sync-alt"></i>
-</div>
-<h2 class="rebirth-title">Перерождение</h2>
-<div class="rebirth-details">
-<div class="rebirth-detail">
-<span>Текущий баланс:</span>
-<span id="current-balance">0 m$</span>
-</div>
-<div class="rebirth-detail">
-<span>Требуется для перерождения:</span>
-<span class="rebirth-cost" id="rebirth-cost">100k m$</span>
-</div>
-<div class="rebirth-detail">
-<span>Доступно:</span>
-<span class="rebirth-available" id="rebirth-available">Нет</span>
-</div>
-<div class="rebirth-detail">
-<span>Новый множитель:</span>
-<span class="rebirth-bonus" id="new-multiplier">x2</span>
-</div>
-<div class="rebirth-detail">
-<span>Потеря прогресса:</span>
-<span class="rebirth-cost">Все улучшения</span>
-</div>
-<div class="rebirth-detail">
-<span>Новые цены в магазине:</span>
-<span class="rebirth-cost">+20%</span>
-</div>
-</div>
-<p class="confirm-message">После перерождения вы потеряете все улучшения, но получите постоянный множитель дохода!</p>
-<div class="rebirth-buttons">
-<button class="rebirth-btn rebirth-confirm" disabled="" id="rebirth-confirm">Переродиться</button>
-<button class="rebirth-btn rebirth-cancel" id="rebirth-cancel">Отмена</button>
-</div>
-</div>
-</div>
-<div class="particles-container" id="particles"></div>
+    <div class="header">
+        <div class="balance-container">
+            <div class="balance" id="balance">0<span class="balance-symbol"> m$</span></div>
+            <div class="rebirth-info" id="rebirth-info">Перерождения: 0 | Множитель: x1</div>
+        </div>
+    </div>
 
-<script>
-// === Новый обновлённый JS ===
-... (сюда будет вставлен код из предыдущего шага, но укорочено для демонстрации)
-</script></body>
+    <div class="main-content">
+        <div class="coin-container">
+            <div class="coin" id="coin">
+                <div class="coin-front">
+                    <img src="logo.png" alt="Монета" class="coin-image">
+                </div>
+                <div class="coin-back">
+                    <img src="logo.png" alt="Монета" class="coin-image">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="bottom-panel">
+        <button class="btn" id="shop-btn">
+            <i class="fas fa-shopping-cart"></i> Магазин
+        </button>
+        <button class="btn" id="rebirth-btn">
+            <i class="fas fa-redo"></i> Перерождение
+        </button>
+        <button class="btn" id="settings-btn">
+            <i class="fas fa-cog"></i> Настройки
+        </button>
+    </div>
+
+    <!-- Модальное окно настроек -->
+    <div class="modal" id="settings-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Настройки</h2>
+                <button class="close-btn" id="close-settings">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="settings-section">
+                <h3 class="settings-section-title">Звук</h3>
+                <div class="setting-item">
+                    <span class="setting-label">Звуки кликов</span>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="sound-toggle" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="setting-item">
+                    <span class="setting-label">Громкость</span>
+                    <input type="range" min="0" max="100" value="80" class="volume-slider" id="volume-slider">
+                </div>
+            </div>
+            
+            <div class="settings-section">
+                <h3 class="settings-section-title">Внешний вид</h3>
+                <div class="setting-item">
+                    <span class="setting-label">Темная тема</span>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="theme-toggle" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="setting-item">
+                    <span class="setting-label">Анимации</span>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="animations-toggle" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </div>
+            
+            <div class="settings-section">
+                <h3 class="settings-section-title">Игровой процесс</h3>
+                <div class="setting-item">
+                    <span class="setting-label">Авто-кликер</span>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="autoclicker-toggle">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="setting-item">
+                    <span class="setting-label">Уведомления</span>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="notifications-toggle" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </div>
+            
+            <button class="stats-btn" id="stats-btn">
+                <i class="fas fa-chart-bar"></i> Статистика
+            </button>
+            
+            <button class="reset-btn" id="reset-btn">
+                <i class="fas fa-redo"></i> Сбросить прогресс
+            </button>
+        </div>
+    </div>
+
+    <!-- Модальное окно магазина -->
+    <div class="modal" id="shop-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Магазин улучшений</h2>
+                <button class="close-btn" id="close-shop">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="shop-items" id="shop-items">
+                <!-- Товары будут добавляться через JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно статистики -->
+    <div class="modal" id="stats-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Статистика</h2>
+                <button class="close-btn" id="close-stats">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="stats-section">
+                <h3 class="settings-section-title">Общая статистика</h3>
+                <div class="stats-item">
+                    <span class="stats-label">Всего кликов:</span>
+                    <span class="stats-value" id="total-clicks">0</span>
+                </div>
+                <div class="stats-item">
+                    <span class="stats-label">Всего заработано:</span>
+                    <span class="stats-value" id="total-earned">0 m$</span>
+                </div>
+                <div class="stats-item">
+                    <span class="stats-label">Время игры:</span>
+                    <span class="stats-value" id="play-time">0:00</span>
+                </div>
+                <div class="stats-item">
+                    <span class="stats-label">Кликов в секунду:</span>
+                    <span class="stats-value" id="clicks-per-second">0</span>
+                </div>
+                <div class="stats-item">
+                    <span class="stats-label">Перерождения:</span>
+                    <span class="stats-value" id="rebirth-count">0</span>
+                </div>
+                <div class="stats-item">
+                    <span class="stats-label">Общий множитель:</span>
+                    <span class="stats-value" id="total-multiplier">x1</span>
+                </div>
+            </div>
+            
+            <div class="stats-section">
+                <h3 class="settings-section-title">Улучшения</h3>
+                <div class="stats-item">
+                    <span class="stats-label">Уровень авто-кликера:</span>
+                    <span class="stats-value" id="autoclicker-level">0</span>
+                </div>
+                <div class="stats-item">
+                    <span class="stats-label">Множитель кликов:</span>
+                    <span class="stats-value" id="click-multiplier">x1</span>
+                </div>
+                <div class="stats-item">
+                    <span class="stats-label">Золотые клики:</span>
+                    <span class="stats-value" id="golden-clicks">0</span>
+                </div>
+            </div>
+            
+            <div class="stats-section">
+                <h3 class="settings-section-title">Достижения</h3>
+                <div class="stats-item">
+                    <span class="stats-label">Прогресс до 1M m$:</span>
+                    <span class="stats-value" id="progress-1m">0%</span>
+                </div>
+                <div class="stats-progress">
+                    <div class="stats-progress-bar" id="progress-bar-1m" style="width: 0%"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно подтверждения сброса -->
+    <div class="confirm-modal" id="confirm-modal">
+        <div class="confirm-content">
+            <div class="confirm-icon">
+                <i class="fas fa-exclamation-triangle"></i>
+            </div>
+            <h2 class="confirm-title">Подтвердите действие</h2>
+            <p class="confirm-message">Вы уверены, что хотите сбросить весь прогресс? Это действие нельзя отменить.</p>
+            <div class="confirm-buttons">
+                <button class="confirm-btn confirm-ok" id="confirm-ok">OK</button>
+                <button class="confirm-btn confirm-cancel" id="confirm-cancel">Отмена</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно перерождения -->
+    <div class="rebirth-modal" id="rebirth-modal">
+        <div class="rebirth-content">
+            <div class="rebirth-icon">
+                <i class="fas fa-sync-alt"></i>
+            </div>
+            <h2 class="rebirth-title">Перерождение</h2>
+            <div class="rebirth-details">
+                <div class="rebirth-detail">
+                    <span>Текущий баланс:</span>
+                    <span id="current-balance">0 m$</span>
+                </div>
+                <div class="rebirth-detail">
+                    <span>Требуется для перерождения:</span>
+                    <span class="rebirth-cost" id="rebirth-cost">100k m$</span>
+                </div>
+                <div class="rebirth-detail">
+                    <span>Доступно:</span>
+                    <span class="rebirth-available" id="rebirth-available">Нет</span>
+                </div>
+                <div class="rebirth-detail">
+                    <span>Новый множитель:</span>
+                    <span class="rebirth-bonus" id="new-multiplier">x2</span>
+                </div>
+                <div class="rebirth-detail">
+                    <span>Потеря прогресса:</span>
+                    <span class="rebirth-cost">Все улучшения</span>
+                </div>
+                <div class="rebirth-detail">
+                    <span>Новые цены в магазине:</span>
+                    <span class="rebirth-cost">+20%</span>
+                </div>
+            </div>
+            <p class="confirm-message">После перерождения вы потеряете все улучшения, но получите постоянный множитель дохода!</p>
+            <div class="rebirth-buttons">
+                <button class="rebirth-btn rebirth-confirm" id="rebirth-confirm" disabled>Переродиться</button>
+                <button class="rebirth-btn rebirth-cancel" id="rebirth-cancel">Отмена</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="particles-container" id="particles"></div>
+
+    <script>
+        // Получаем элементы
+        const balanceElement = document.getElementById('balance');
+        const coinElement = document.getElementById('coin');
+        const coinContainer = document.querySelector('.coin-container');
+        const shopBtn = document.getElementById('shop-btn');
+        const settingsBtn = document.getElementById('settings-btn');
+        const rebirthBtn = document.getElementById('rebirth-btn');
+        const statsBtn = document.getElementById('stats-btn');
+        const particlesContainer = document.getElementById('particles');
+        const settingsModal = document.getElementById('settings-modal');
+        const shopModal = document.getElementById('shop-modal');
+        const statsModal = document.getElementById('stats-modal');
+        const confirmModal = document.getElementById('confirm-modal');
+        const rebirthModal = document.getElementById('rebirth-modal');
+        const closeSettingsBtn = document.getElementById('close-settings');
+        const closeShopBtn = document.getElementById('close-shop');
+        const closeStatsBtn = document.getElementById('close-stats');
+        const resetBtn = document.getElementById('reset-btn');
+        const confirmOkBtn = document.getElementById('confirm-ok');
+        const confirmCancelBtn = document.getElementById('confirm-cancel');
+        const rebirthConfirmBtn = document.getElementById('rebirth-confirm');
+        const rebirthCancelBtn = document.getElementById('rebirth-cancel');
+        const shopItemsContainer = document.getElementById('shop-items');
+        const rebirthInfoElement = document.getElementById('rebirth-info');
+
+        // Статистика
+        let totalClicks = parseInt(localStorage.getItem('totalClicks')) || 0;
+        let totalEarned = parseInt(localStorage.getItem('totalEarned')) || 0;
+        let playTime = parseInt(localStorage.getItem('playTime')) || 0;
+        let goldenClicks = parseInt(localStorage.getItem('goldenClicks')) || 0;
+        let rebirthCount = parseInt(localStorage.getItem('rebirthCount')) || 0;
+        let rebirthMultiplier = parseFloat(localStorage.getItem('rebirthMultiplier')) || 1;
+        let priceMultiplier = parseFloat(localStorage.getItem('priceMultiplier')) || 1;
+        let startTime = Date.now();
+
+        // Загружаем баланс и улучшения из localStorage
+        let balance = parseInt(localStorage.getItem('clickerBalance')) || 0;
+        let upgrades = JSON.parse(localStorage.getItem('clickerUpgrades')) || {
+            autoClicker: { level: 0, cost: 50, autoClicks: 0 },
+            doubleClick: { level: 0, cost: 100, multiplier: 1 },
+            goldenClick: { level: 0, cost: 200, chance: 0, maxLevel: 1 }
+        };
+
+        // Автокликер
+        let autoClickInterval;
+        let statsInterval;
+
+        // Функция для расчета стоимости перерождения
+        function getRebirthCost() {
+            return 100000 * Math.pow(2, rebirthCount); // 100k, 200k, 400k и т.д.
+        }
+
+        // Функция для расчета нового множителя
+        function getNewMultiplier() {
+            return rebirthMultiplier * 2; // Каждое перерождение удваивает множитель
+        }
+
+        // Функция для расчета нового множителя цен
+        function getNewPriceMultiplier() {
+            return priceMultiplier * 1.2; // Каждое перерождение увеличивает цены на 20%
+        }
+
+        // Функция для форматирования чисел
+        function formatNumber(num) {
+            if (num >= 1000000) {
+                return (num / 1000000).toFixed(1) + 'M';
+            } else if (num >= 1000) {
+                return (num / 1000).toFixed(1) + 'k';
+            }
+            return num.toString();
+        }
+
+        // Обновляем отображение баланса
+        function updateBalance() {
+            balanceElement.textContent = formatNumber(balance);
+            rebirthInfoElement.textContent = `Перерождения: ${rebirthCount} | Множитель: x${rebirthMultiplier}`;
+        }
+
+        // Функция для создания эффекта клика
+        function createClickEffect(x, y) {
+            const effect = document.createElement('div');
+            effect.className = 'click-effect';
+            effect.style.left = `${x - 25}px`;
+            effect.style.top = `${y - 25}px`;
+            document.body.appendChild(effect);
+            
+            // Удаляем эффект после завершения анимации
+            setTimeout(() => {
+                effect.remove();
+            }, 500);
+        }
+
+        // Функция для отображения значения клика на монете
+        function showClickValueOnCoin(value) {
+            const clickValue = document.createElement('div');
+            clickValue.className = 'coin-click-value';
+            clickValue.textContent = `+${formatNumber(value)}`;
+            coinContainer.appendChild(clickValue);
+            
+            // Удаляем элемент после анимации
+            setTimeout(() => {
+                clickValue.remove();
+            }, 1500);
+        }
+
+        // Функция для создания частиц
+        function createParticles() {
+            particlesContainer.innerHTML = ''; // Очищаем контейнер
+            for (let i = 0; i < 25; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                const particleType = Math.floor(Math.random() * 5) + 1;
+                particle.classList.add(`type${particleType}`);
+                particle.style.left = `${Math.random() * 100}vw`;
+                particle.style.animationDelay = `${Math.random() * 2}s`;
+                particle.style.animationDuration = `${10 + Math.random() * 10}s`;
+                particlesContainer.appendChild(particle);
+            }
+        }
+
+        // Функция для обновления статистики
+        function updateStats() {
+            const currentTime = Math.floor((Date.now() - startTime) / 1000) + playTime;
+            const minutes = Math.floor(currentTime / 60);
+            const seconds = currentTime % 60;
+            
+            document.getElementById('total-clicks').textContent = formatNumber(totalClicks);
+            document.getElementById('total-earned').textContent = formatNumber(totalEarned) + ' m$';
+            document.getElementById('play-time').textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+            document.getElementById('clicks-per-second').textContent = (totalClicks / Math.max(1, currentTime)).toFixed(1);
+            document.getElementById('rebirth-count').textContent = rebirthCount;
+            document.getElementById('total-multiplier').textContent = 'x' + rebirthMultiplier;
+            document.getElementById('autoclicker-level').textContent = upgrades.autoClicker.level;
+            document.getElementById('click-multiplier').textContent = 'x' + (upgrades.doubleClick.multiplier * rebirthMultiplier);
+            document.getElementById('golden-clicks').textContent = goldenClicks;
+            
+            const progress = Math.min(100, (balance / 1000000) * 100);
+            document.getElementById('progress-1m').textContent = progress.toFixed(1) + '%';
+            document.getElementById('progress-bar-1m').style.width = progress + '%';
+        }
+
+        // Функция для обновления модального окна перерождения
+        function updateRebirthModal() {
+            const rebirthCost = getRebirthCost();
+            const newMultiplier = getNewMultiplier();
+            const canRebirth = balance >= rebirthCost;
+            
+            document.getElementById('current-balance').textContent = formatNumber(balance) + ' m$';
+            document.getElementById('rebirth-cost').textContent = formatNumber(rebirthCost) + ' m$';
+            document.getElementById('rebirth-available').textContent = canRebirth ? 'Да' : 'Нет';
+            document.getElementById('rebirth-available').className = canRebirth ? 'rebirth-available' : 'rebirth-unavailable';
+            document.getElementById('new-multiplier').textContent = 'x' + newMultiplier;
+            
+            rebirthConfirmBtn.disabled = !canRebirth;
+        }
+
+        // Обработчик клика по монете
+        coinElement.addEventListener('click', (e) => {
+            // Базовый клик с учетом множителя перерождения
+            let clickValue = 1 * rebirthMultiplier;
+            
+            // Умножаем на множитель двойного клика
+            clickValue *= upgrades.doubleClick.multiplier;
+            
+            // Шанс золотого клика
+            let isGolden = false;
+            if (Math.random() < upgrades.goldenClick.chance) {
+                clickValue *= 5;
+                isGolden = true;
+                goldenClicks++;
+                localStorage.setItem('goldenClicks', goldenClicks);
+            }
+            
+            // Увеличиваем баланс
+            balance += clickValue;
+            totalClicks++;
+            totalEarned += clickValue;
+            
+            // Сохраняем данные
+            localStorage.setItem('clickerBalance', balance);
+            localStorage.setItem('totalClicks', totalClicks);
+            localStorage.setItem('totalEarned', totalEarned);
+            
+            // Обновляем отображение
+            updateBalance();
+            
+            // Показываем значение клика на монете
+            showClickValueOnCoin(clickValue);
+            
+            // Создаем эффект клика
+            createClickEffect(e.clientX, e.clientY);
+            
+            // Анимация монеты
+            coinElement.style.transform = 'scale(0.95) rotateY(5deg)';
+            setTimeout(() => {
+                coinElement.style.transform = '';
+            }, 100);
+        });
+
+        // Функция автокликера
+        function startAutoClicker() {
+            if (autoClickInterval) clearInterval(autoClickInterval);
+            
+            autoClickInterval = setInterval(() => {
+                if (upgrades.autoClicker.autoClicks > 0) {
+                    const autoClickValue = upgrades.autoClicker.autoClicks * upgrades.doubleClick.multiplier * rebirthMultiplier;
+                    balance += autoClickValue;
+                    totalEarned += autoClickValue;
+                    localStorage.setItem('clickerBalance', balance);
+                    localStorage.setItem('totalEarned', totalEarned);
+                    updateBalance();
+                    
+                    // Создаем эффект автоклика
+                    const coinRect = coinElement.getBoundingClientRect();
+                    const x = coinRect.left + coinRect.width / 2;
+                    const y = coinRect.top + coinRect.height / 2;
+                    createClickEffect(x, y);
+                    
+                    // Показываем значение автоклика на монете
+                    showClickValueOnCoin(autoClickValue);
+                }
+            }, 1000);
+        }
+
+        // Функция перерождения
+        function performRebirth() {
+            const rebirthCost = getRebirthCost();
+            
+            if (balance >= rebirthCost) {
+                // Увеличиваем счетчик перерождений
+                rebirthCount++;
+                rebirthMultiplier = getNewMultiplier();
+                priceMultiplier = getNewPriceMultiplier();
+                
+                // Сбрасываем прогресс
+                balance = 0;
+                upgrades = {
+                    autoClicker: { level: 0, cost: 50, autoClicks: 0 },
+                    doubleClick: { level: 0, cost: 100, multiplier: 1 },
+                    goldenClick: { level: 0, cost: 200, chance: 0, maxLevel: 1 }
+                };
+                
+                // Сохраняем данные
+                localStorage.setItem('clickerBalance', balance);
+                localStorage.setItem('clickerUpgrades', JSON.stringify(upgrades));
+                localStorage.setItem('rebirthCount', rebirthCount);
+                localStorage.setItem('rebirthMultiplier', rebirthMultiplier);
+                localStorage.setItem('priceMultiplier', priceMultiplier);
+                
+                // Обновляем отображение
+                updateBalance();
+                startAutoClicker();
+                
+                // Закрываем модальное окно
+                rebirthModal.classList.remove('active');
+                
+                alert(`Перерождение успешно! Теперь у вас множитель x${rebirthMultiplier} и цены в магазине увеличены на 20%`);
+            }
+        }
+
+        // Обработчик движения мыши для эффекта наведения
+        document.addEventListener('mousemove', (e) => {
+            const coinRect = coinElement.getBoundingClientRect();
+            const coinCenterX = coinRect.left + coinRect.width / 2;
+            const coinCenterY = coinRect.top + coinRect.height / 2;
+            
+            const deltaX = (e.clientX - coinCenterX) / 50;
+            const deltaY = (e.clientY - coinCenterY) / 50;
+            
+            coinElement.style.transform = `rotateY(${deltaX}deg) rotateX(${-deltaY}deg)`;
+        });
+
+        // Обработчик выхода мыши за пределы монеты
+        coinElement.addEventListener('mouseleave', () => {
+            coinElement.style.transform = '';
+        });
+
+        // Открытие модальных окон
+        settingsBtn.addEventListener('click', () => {
+            settingsModal.classList.add('active');
+        });
+
+        shopBtn.addEventListener('click', () => {
+            shopModal.classList.add('active');
+            renderShopItems();
+        });
+
+        statsBtn.addEventListener('click', () => {
+            statsModal.classList.add('active');
+            updateStats();
+        });
+
+        rebirthBtn.addEventListener('click', () => {
+            rebirthModal.classList.add('active');
+            updateRebirthModal();
+        });
+
+        // Закрытие модальных окон
+        closeSettingsBtn.addEventListener('click', () => {
+            settingsModal.classList.remove('active');
+        });
+
+        closeShopBtn.addEventListener('click', () => {
+            shopModal.classList.remove('active');
+        });
+
+        closeStatsBtn.addEventListener('click', () => {
+            statsModal.classList.remove('active');
+        });
+
+        // Закрытие модальных окон при клике вне их
+        settingsModal.addEventListener('click', (e) => {
+            if (e.target === settingsModal) {
+                settingsModal.classList.remove('active');
+            }
+        });
+
+        shopModal.addEventListener('click', (e) => {
+            if (e.target === shopModal) {
+                shopModal.classList.remove('active');
+            }
+        });
+
+        statsModal.addEventListener('click', (e) => {
+            if (e.target === statsModal) {
+                statsModal.classList.remove('active');
+            }
+        });
+
+        confirmModal.addEventListener('click', (e) => {
+            if (e.target === confirmModal) {
+                confirmModal.classList.remove('active');
+            }
+        });
+
+        rebirthModal.addEventListener('click', (e) => {
+            if (e.target === rebirthModal) {
+                rebirthModal.classList.remove('active');
+            }
+        });
+
+        // Сброс прогресса
+        resetBtn.addEventListener('click', () => {
+            confirmModal.classList.add('active');
+        });
+
+        confirmOkBtn.addEventListener('click', () => {
+            balance = 0;
+            totalClicks = 0;
+            totalEarned = 0;
+            playTime = 0;
+            goldenClicks = 0;
+            rebirthCount = 0;
+            rebirthMultiplier = 1;
+            priceMultiplier = 1;
+            startTime = Date.now();
+            upgrades = {
+                autoClicker: { level: 0, cost: 50, autoClicks: 0 },
+                doubleClick: { level: 0, cost: 100, multiplier: 1 },
+                goldenClick: { level: 0, cost: 200, chance: 0, maxLevel: 1 }
+            };
+            localStorage.setItem('clickerBalance', balance);
+            localStorage.setItem('totalClicks', totalClicks);
+            localStorage.setItem('totalEarned', totalEarned);
+            localStorage.setItem('playTime', playTime);
+            localStorage.setItem('goldenClicks', goldenClicks);
+            localStorage.setItem('rebirthCount', rebirthCount);
+            localStorage.setItem('rebirthMultiplier', rebirthMultiplier);
+            localStorage.setItem('priceMultiplier', priceMultiplier);
+            localStorage.setItem('clickerUpgrades', JSON.stringify(upgrades));
+            updateBalance();
+            startAutoClicker();
+            settingsModal.classList.remove('active');
+            confirmModal.classList.remove('active');
+        });
+
+        confirmCancelBtn.addEventListener('click', () => {
+            confirmModal.classList.remove('active');
+        });
+
+        rebirthConfirmBtn.addEventListener('click', () => {
+            performRebirth();
+        });
+
+        rebirthCancelBtn.addEventListener('click', () => {
+            rebirthModal.classList.remove('active');
+        });
+
+        // Функция рендера товаров в магазине
+        function renderShopItems() {
+            shopItemsContainer.innerHTML = '';
+            
+            const shopItems = [
+                {
+                    id: 'autoClicker',
+                    title: 'Авто-кликер',
+                    description: 'Автоматически кликает за вас',
+                    baseCost: 50,
+                    level: upgrades.autoClicker.level,
+                    maxLevel: 10,
+                    getCost: function() {
+                        return Math.floor(this.baseCost * Math.pow(1.5, this.level) * priceMultiplier);
+                    },
+                    effect: function() {
+                        return `+${this.level} кликов/сек`;
+                    },
+                    buy: function() {
+                        const cost = this.getCost();
+                        if (balance >= cost && this.level < this.maxLevel) {
+                            balance -= cost;
+                            this.level++;
+                            upgrades.autoClicker.level = this.level;
+                            upgrades.autoClicker.autoClicks = this.level;
+                            upgrades.autoClicker.cost = this.getCost();
+                            localStorage.setItem('clickerBalance', balance);
+                            localStorage.setItem('clickerUpgrades', JSON.stringify(upgrades));
+                            updateBalance();
+                            startAutoClicker();
+                            renderShopItems();
+                        }
+                    }
+                },
+                {
+                    id: 'doubleClick',
+                    title: 'Усилитель кликов',
+                    description: 'Увеличивает силу каждого клика',
+                    baseCost: 100,
+                    level: upgrades.doubleClick.level,
+                    maxLevel: 5,
+                    getCost: function() {
+                        return Math.floor(this.baseCost * Math.pow(2, this.level) * priceMultiplier);
+                    },
+                    effect: function() {
+                        return `x${1 + this.level} к кликам`;
+                    },
+                    buy: function() {
+                        const cost = this.getCost();
+                        if (balance >= cost && this.level < this.maxLevel) {
+                            balance -= cost;
+                            this.level++;
+                            upgrades.doubleClick.level = this.level;
+                            upgrades.doubleClick.multiplier = 1 + this.level;
+                            upgrades.doubleClick.cost = this.getCost();
+                            localStorage.setItem('clickerBalance', balance);
+                            localStorage.setItem('clickerUpgrades', JSON.stringify(upgrades));
+                            updateBalance();
+                            renderShopItems();
+                        }
+                    }
+                },
+                {
+                    id: 'goldenClick',
+                    title: 'Золотой клик',
+                    description: 'Шанс получить 5x монет за клик',
+                    baseCost: 200,
+                    level: upgrades.goldenClick.level,
+                    maxLevel: 1,
+                    getCost: function() {
+                        return Math.floor(this.baseCost * priceMultiplier);
+                    },
+                    effect: function() {
+                        return `${2}% шанс`;
+                    },
+                    buy: function() {
+                        const cost = this.getCost();
+                        if (balance >= cost && this.level < this.maxLevel) {
+                            balance -= cost;
+                            this.level++;
+                            upgrades.goldenClick.level = this.level;
+                            upgrades.goldenClick.chance = 0.02; // 2% шанс
+                            upgrades.goldenClick.cost = this.getCost();
+                            localStorage.setItem('clickerBalance', balance);
+                            localStorage.setItem('clickerUpgrades', JSON.stringify(upgrades));
+                            updateBalance();
+                            renderShopItems();
+                        }
+                    }
+                }
+            ];
+            
+            shopItems.forEach(item => {
+                const shopItem = document.createElement('div');
+                shopItem.className = 'shop-item';
+                
+                const cost = item.getCost();
+                const canBuy = balance >= cost && item.level < item.maxLevel;
+                
+                shopItem.innerHTML = `
+                    <div class="shop-item-info">
+                        <div class="shop-item-title">${item.title} ${item.level > 0 ? `<span class="owned-badge">Ур. ${item.level}</span>` : ''}</div>
+                        <div class="shop-item-description">${item.description}</div>
+                        <div class="shop-item-effect">Эффект: ${item.effect()}</div>
+                        <div class="shop-item-price">Цена: ${formatNumber(cost)} m$</div>
+                    </div>
+                    <button class="shop-item-btn" ${!canBuy ? 'disabled' : ''}>
+                        ${item.level >= item.maxLevel ? 'Куплено' : 'Купить'}
+                    </button>
+                `;
+                
+                const buyBtn = shopItem.querySelector('.shop-item-btn');
+                if (item.level < item.maxLevel) {
+                    buyBtn.addEventListener('click', () => {
+                        item.buy();
+                    });
+                }
+                
+                shopItemsContainer.appendChild(shopItem);
+            });
+        }
+
+        // Инициализация
+        updateBalance();
+        createParticles();
+        startAutoClicker();
+
+        // Запускаем обновление статистики
+        statsInterval = setInterval(() => {
+            if (statsModal.classList.contains('active')) {
+                updateStats();
+            }
+        }, 1000);
+
+        // Сохраняем время игры при закрытии
+        window.addEventListener('beforeunload', () => {
+            const currentPlayTime = Math.floor((Date.now() - startTime) / 1000);
+            localStorage.setItem('playTime', playTime + currentPlayTime);
+        });
+    </script>
+</body>
 </html>
