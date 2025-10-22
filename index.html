@@ -14,7 +14,7 @@
         }
 
         body {
-            background: linear-gradient(135deg, #2d1b69, #6a2cb2);
+            background: linear-gradient(135deg, #0d1b4c, #8a1a1a, #d4941f);
             color: white;
             min-height: 100vh;
             display: flex;
@@ -115,28 +115,28 @@
             box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
         }
 
-        .click-value {
+        .coin-click-value {
             position: absolute;
-            top: -30px;
+            top: 50%;
             left: 50%;
-            transform: translateX(-50%);
-            font-size: 1.5rem;
+            transform: translate(-50%, -50%);
+            font-size: 2rem;
             font-weight: bold;
             color: #ffd700;
             text-shadow: 0 0 10px rgba(255, 215, 0, 0.7);
             opacity: 0;
-            animation: float-up 1s ease-out forwards;
+            animation: coin-float 1s ease-out forwards;
             pointer-events: none;
             z-index: 10;
         }
 
-        @keyframes float-up {
+        @keyframes coin-float {
             0% {
-                transform: translateX(-50%) translateY(0);
+                transform: translate(-50%, -50%) scale(1);
                 opacity: 1;
             }
             100% {
-                transform: translateX(-50%) translateY(-50px);
+                transform: translate(-50%, -50%) scale(1.5);
                 opacity: 0;
             }
         }
@@ -146,7 +146,7 @@
             border-radius: 25px;
             padding: 25px;
             width: 90%;
-            max-width: 500px;
+            max-width: 600px;
             display: flex;
             justify-content: space-around;
             margin-top: auto;
@@ -159,9 +159,9 @@
         .btn {
             color: white;
             border: none;
-            padding: 15px 30px;
+            padding: 12px 20px;
             border-radius: 15px;
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             cursor: pointer;
             transition: all 0.3s ease;
             box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
@@ -169,8 +169,11 @@
             overflow: hidden;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
             font-weight: bold;
+            flex: 1;
+            margin: 0 5px;
+            justify-content: center;
         }
 
         .btn::before {
@@ -199,7 +202,7 @@
         }
 
         .btn i {
-            font-size: 1.3rem;
+            font-size: 1.1rem;
         }
 
         #shop-btn {
@@ -216,6 +219,14 @@
 
         #settings-btn:hover {
             background: linear-gradient(135deg, #3a9dfc, #00d9fe);
+        }
+
+        #rebirth-btn {
+            background: linear-gradient(135deg, #9b59b6, #8e44ad);
+        }
+
+        #rebirth-btn:hover {
+            background: linear-gradient(135deg, #8e44ad, #7d3c98);
         }
 
         .click-effect {
@@ -430,7 +441,7 @@
             cursor: pointer;
         }
 
-        .reset-btn {
+        .reset-btn, .stats-btn {
             background: linear-gradient(135deg, #ff6b6b, #ff5252);
             color: white;
             border: none;
@@ -443,8 +454,18 @@
             width: 100%;
         }
 
+        .stats-btn {
+            background: linear-gradient(135deg, #4facfe, #00f2fe);
+            margin-top: 5px;
+        }
+
         .reset-btn:hover {
             background: linear-gradient(135deg, #ff5252, #ff3838);
+            transform: translateY(-2px);
+        }
+
+        .stats-btn:hover {
+            background: linear-gradient(135deg, #3a9dfc, #00d9fe);
             transform: translateY(-2px);
         }
 
@@ -765,6 +786,9 @@
         <button class="btn" id="shop-btn">
             <i class="fas fa-shopping-cart"></i> Магазин
         </button>
+        <button class="btn" id="rebirth-btn">
+            <i class="fas fa-redo"></i> Перерождение
+        </button>
         <button class="btn" id="settings-btn">
             <i class="fas fa-cog"></i> Настройки
         </button>
@@ -831,6 +855,10 @@
                 </div>
             </div>
             
+            <button class="stats-btn" id="stats-btn">
+                <i class="fas fa-chart-bar"></i> Статистика
+            </button>
+            
             <button class="reset-btn" id="reset-btn">
                 <i class="fas fa-redo"></i> Сбросить прогресс
             </button>
@@ -877,6 +905,8 @@
         const coinContainer = document.querySelector('.coin-container');
         const shopBtn = document.getElementById('shop-btn');
         const settingsBtn = document.getElementById('settings-btn');
+        const rebirthBtn = document.getElementById('rebirth-btn');
+        const statsBtn = document.getElementById('stats-btn');
         const particlesContainer = document.getElementById('particles');
         const settingsModal = document.getElementById('settings-modal');
         const shopModal = document.getElementById('shop-modal');
@@ -893,7 +923,7 @@
         let upgrades = JSON.parse(localStorage.getItem('clickerUpgrades')) || {
             autoClicker: { level: 0, cost: 50, autoClicks: 0 },
             doubleClick: { level: 0, cost: 100, multiplier: 1 },
-            goldenClick: { level: 0, cost: 200, chance: 0 }
+            goldenClick: { level: 0, cost: 200, chance: 0, maxLevel: 1 }
         };
 
         // Автокликер
@@ -918,13 +948,11 @@
             }, 500);
         }
 
-        // Функция для отображения значения клика
-        function showClickValue(value, x, y) {
+        // Функция для отображения значения клика на монете
+        function showClickValueOnCoin(value) {
             const clickValue = document.createElement('div');
-            clickValue.className = 'click-value';
+            clickValue.className = 'coin-click-value';
             clickValue.textContent = `+${value}`;
-            clickValue.style.left = `${x}px`;
-            clickValue.style.top = `${y}px`;
             coinContainer.appendChild(clickValue);
             
             // Удаляем элемент после анимации
@@ -968,8 +996,8 @@
             // Обновляем отображение
             updateBalance();
             
-            // Показываем значение клика
-            showClickValue(clickValue, e.clientX, e.clientY);
+            // Показываем значение клика на монете
+            showClickValueOnCoin(clickValue);
             
             // Создаем эффект клика
             createClickEffect(e.clientX, e.clientY);
@@ -998,8 +1026,8 @@
                     const y = coinRect.top + coinRect.height / 2;
                     createClickEffect(x, y);
                     
-                    // Показываем значение автоклика
-                    showClickValue(autoClickValue, x, y - 50);
+                    // Показываем значение автоклика на монете
+                    showClickValueOnCoin(autoClickValue);
                 }
             }, 1000);
         }
@@ -1029,6 +1057,15 @@
         shopBtn.addEventListener('click', () => {
             shopModal.classList.add('active');
             renderShopItems();
+        });
+
+        // Заглушки для новых кнопок
+        rebirthBtn.addEventListener('click', () => {
+            alert('Функция перерождения скоро будет доступна!');
+        });
+
+        statsBtn.addEventListener('click', () => {
+            alert('Статистика скоро будет доступна!');
         });
 
         // Закрытие модальных окон
@@ -1069,7 +1106,7 @@
             upgrades = {
                 autoClicker: { level: 0, cost: 50, autoClicks: 0 },
                 doubleClick: { level: 0, cost: 100, multiplier: 1 },
-                goldenClick: { level: 0, cost: 200, chance: 0 }
+                goldenClick: { level: 0, cost: 200, chance: 0, maxLevel: 1 }
             };
             localStorage.setItem('clickerBalance', balance);
             localStorage.setItem('clickerUpgrades', JSON.stringify(upgrades));
@@ -1151,12 +1188,12 @@
                     description: 'Шанс получить 5x монет за клик',
                     baseCost: 200,
                     level: upgrades.goldenClick.level,
-                    maxLevel: 5,
+                    maxLevel: 1,
                     getCost: function() {
-                        return Math.floor(this.baseCost * Math.pow(2.5, this.level));
+                        return this.baseCost;
                     },
                     effect: function() {
-                        return `${this.level * 5}% шанс`;
+                        return `${2}% шанс`;
                     },
                     buy: function() {
                         const cost = this.getCost();
@@ -1164,7 +1201,7 @@
                             balance -= cost;
                             this.level++;
                             upgrades.goldenClick.level = this.level;
-                            upgrades.goldenClick.chance = this.level * 0.05;
+                            upgrades.goldenClick.chance = 0.02; // 2% шанс
                             upgrades.goldenClick.cost = this.getCost();
                             localStorage.setItem('clickerBalance', balance);
                             localStorage.setItem('clickerUpgrades', JSON.stringify(upgrades));
@@ -1190,7 +1227,7 @@
                         <div class="shop-item-price">Цена: ${cost} m$</div>
                     </div>
                     <button class="shop-item-btn" ${!canBuy ? 'disabled' : ''}>
-                        ${item.level >= item.maxLevel ? 'Макс. ур.' : 'Купить'}
+                        ${item.level >= item.maxLevel ? 'Куплено' : 'Купить'}
                     </button>
                 `;
                 
