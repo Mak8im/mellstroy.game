@@ -58,6 +58,20 @@
             text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
         }
 
+        .bonus-indicator {
+            margin-top: 10px;
+            font-size: 1rem;
+            color: #ff6b6b;
+            text-shadow: 0 0 10px rgba(255, 107, 107, 0.5);
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 0.7; }
+            50% { opacity: 1; }
+            100% { opacity: 0.7; }
+        }
+
         .main-content {
             display: flex;
             flex-direction: column;
@@ -288,6 +302,25 @@
             background-repeat: no-repeat;
             animation: float 15s infinite linear;
             opacity: 0.7;
+            pointer-events: none;
+        }
+
+        .particle.bonus-particle {
+            pointer-events: auto;
+            cursor: pointer;
+            z-index: 100;
+            animation: float 15s infinite linear, glow 1.5s infinite alternate;
+        }
+
+        @keyframes glow {
+            0% {
+                filter: drop-shadow(0 0 5px #ffd700) drop-shadow(0 0 10px #ff6b6b);
+                transform: scale(1);
+            }
+            100% {
+                filter: drop-shadow(0 0 15px #ffd700) drop-shadow(0 0 20px #ff6b6b);
+                transform: scale(1.2);
+            }
         }
 
         .particle.type1 {
@@ -855,6 +888,111 @@
             transform: translateY(-2px);
         }
 
+        /* Стили для бонусного модального окна */
+        .bonus-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            z-index: 2000;
+        }
+
+        .bonus-modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .bonus-content {
+            background: linear-gradient(135deg, #2a2a4a, #1a1a3a);
+            border-radius: 20px;
+            padding: 30px;
+            width: 90%;
+            max-width: 450px;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.5);
+            transform: translateY(-50px);
+            transition: transform 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+        }
+
+        .bonus-modal.active .bonus-content {
+            transform: translateY(0);
+        }
+
+        .bonus-icon {
+            font-size: 3rem;
+            color: #ffd700;
+            margin-bottom: 20px;
+            animation: pulse 1.5s infinite;
+        }
+
+        .bonus-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #fff;
+        }
+
+        .bonus-message {
+            font-size: 1rem;
+            margin-bottom: 25px;
+            color: #ccc;
+            line-height: 1.5;
+        }
+
+        .bonus-details {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+
+        .bonus-detail {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+        }
+
+        .bonus-detail:last-child {
+            margin-bottom: 0;
+        }
+
+        .bonus-value {
+            color: #ffd700;
+            font-weight: bold;
+        }
+
+        .bonus-time {
+            color: #4facfe;
+            font-weight: bold;
+        }
+
+        .bonus-ok {
+            background: linear-gradient(135deg, #ffd700, #ff6b6b);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 10px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+        }
+
+        .bonus-ok:hover {
+            background: linear-gradient(135deg, #ffc400, #ff5252);
+            transform: translateY(-2px);
+        }
+
         /* Адаптация для телефонов */
         @media (max-width: 768px) {
             body {
@@ -911,7 +1049,7 @@
                 gap: 10px;
             }
             
-            .confirm-content, .rebirth-content {
+            .confirm-content, .rebirth-content, .bonus-content {
                 padding: 25px;
             }
             
@@ -983,6 +1121,7 @@
         <div class="balance-container">
             <div class="balance" id="balance">0<span class="balance-symbol"> m$</span></div>
             <div class="rebirth-info" id="rebirth-info">Перерождения: 0 | Множитель: x1</div>
+            <div class="bonus-indicator" id="bonus-indicator" style="display: none;"></div>
         </div>
     </div>
 
@@ -1188,6 +1327,28 @@
         </div>
     </div>
 
+    <!-- Модальное окно бонуса -->
+    <div class="bonus-modal" id="bonus-modal">
+        <div class="bonus-content">
+            <div class="bonus-icon">
+                <i class="fas fa-gem"></i>
+            </div>
+            <h2 class="bonus-title">Поздравляем!</h2>
+            <div class="bonus-details">
+                <div class="bonus-detail">
+                    <span>Вы активировали бонус:</span>
+                    <span class="bonus-value">x20 к нажатию</span>
+                </div>
+                <div class="bonus-detail">
+                    <span>Длительность:</span>
+                    <span class="bonus-time">30 секунд</span>
+                </div>
+            </div>
+            <p class="bonus-message">Теперь каждое нажатие на монету будет приносить в 20 раз больше монет!</p>
+            <button class="bonus-ok" id="bonus-ok">Отлично!</button>
+        </div>
+    </div>
+
     <div class="particles-container" id="particles"></div>
 
     <script>
@@ -1205,6 +1366,7 @@
         const statsModal = document.getElementById('stats-modal');
         const confirmModal = document.getElementById('confirm-modal');
         const rebirthModal = document.getElementById('rebirth-modal');
+        const bonusModal = document.getElementById('bonus-modal');
         const closeSettingsBtn = document.getElementById('close-settings');
         const closeShopBtn = document.getElementById('close-shop');
         const closeStatsBtn = document.getElementById('close-stats');
@@ -1213,8 +1375,10 @@
         const confirmCancelBtn = document.getElementById('confirm-cancel');
         const rebirthConfirmBtn = document.getElementById('rebirth-confirm');
         const rebirthCancelBtn = document.getElementById('rebirth-cancel');
+        const bonusOkBtn = document.getElementById('bonus-ok');
         const shopItemsContainer = document.getElementById('shop-items');
         const rebirthInfoElement = document.getElementById('rebirth-info');
+        const bonusIndicator = document.getElementById('bonus-indicator');
         const autoclickerToggle = document.getElementById('autoclicker-toggle');
         const particlesToggle = document.getElementById('particles-toggle');
 
@@ -1232,6 +1396,12 @@
         let autoclickerEnabled = localStorage.getItem('autoclickerEnabled') !== 'false'; // по умолчанию включен
         let particlesEnabled = localStorage.getItem('particlesEnabled') !== 'false'; // по умолчанию включены
 
+        // Бонусная система
+        let clickBonusMultiplier = 1;
+        let bonusActive = false;
+        let bonusTimeLeft = 0;
+        let bonusInterval;
+
         // Загружаем баланс и улучшения из localStorage
         let balance = parseInt(localStorage.getItem('clickerBalance')) || 0;
         let upgrades = JSON.parse(localStorage.getItem('clickerUpgrades')) || {
@@ -1243,6 +1413,7 @@
         // Автокликер
         let autoClickInterval;
         let statsInterval;
+        let bonusParticleInterval;
 
         // Функция для расчета стоимости перерождения
         function getRebirthCost() {
@@ -1273,6 +1444,14 @@
         function updateBalance() {
             balanceElement.textContent = formatNumber(balance);
             rebirthInfoElement.textContent = `Перерождения: ${rebirthCount} | Множитель: x${rebirthMultiplier}`;
+            
+            // Обновляем индикатор бонуса
+            if (bonusActive) {
+                bonusIndicator.style.display = 'block';
+                bonusIndicator.textContent = `Бонус x${clickBonusMultiplier} активен! Осталось: ${bonusTimeLeft}сек`;
+            } else {
+                bonusIndicator.style.display = 'none';
+            }
         }
 
         // Функция для создания эффекта клика
@@ -1319,6 +1498,67 @@
             }
         }
 
+        // Функция для создания бонусной частицы
+        function createBonusParticle() {
+            if (!particlesEnabled) return;
+            
+            const particles = document.querySelectorAll('.particle');
+            if (particles.length === 0) return;
+            
+            // Выбираем случайную частицу
+            const randomIndex = Math.floor(Math.random() * particles.length);
+            const bonusParticle = particles[randomIndex];
+            
+            // Делаем ее бонусной
+            bonusParticle.classList.add('bonus-particle');
+            
+            // Добавляем обработчик клика
+            bonusParticle.addEventListener('click', activateBonus);
+            
+            // Убираем бонус через 30 секунд, если не нажали
+            setTimeout(() => {
+                if (bonusParticle.classList.contains('bonus-particle')) {
+                    bonusParticle.classList.remove('bonus-particle');
+                    bonusParticle.removeEventListener('click', activateBonus);
+                }
+            }, 30000);
+        }
+
+        // Функция активации бонуса
+        function activateBonus() {
+            clickBonusMultiplier = 20;
+            bonusActive = true;
+            bonusTimeLeft = 30;
+            
+            // Показываем модальное окно
+            bonusModal.classList.add('active');
+            
+            // Запускаем таймер бонуса
+            if (bonusInterval) clearInterval(bonusInterval);
+            bonusInterval = setInterval(() => {
+                bonusTimeLeft--;
+                updateBalance();
+                
+                if (bonusTimeLeft <= 0) {
+                    clearInterval(bonusInterval);
+                    bonusActive = false;
+                    clickBonusMultiplier = 1;
+                    updateBalance();
+                }
+            }, 1000);
+            
+            // Убираем бонус со всех частиц
+            const bonusParticles = document.querySelectorAll('.bonus-particle');
+            bonusParticles.forEach(particle => {
+                particle.classList.remove('bonus-particle');
+                particle.removeEventListener('click', activateBonus);
+            });
+            
+            // Перезапускаем интервал создания бонусных частиц
+            if (bonusParticleInterval) clearInterval(bonusParticleInterval);
+            bonusParticleInterval = setInterval(createBonusParticle, 120000); // 2 минуты
+        }
+
         // Функция для обновления статистики
         function updateStats() {
             const currentTime = Math.floor((Date.now() - startTime) / 1000) + playTime;
@@ -1363,6 +1603,9 @@
             // Умножаем на множитель двойного клика
             clickValue *= upgrades.doubleClick.multiplier;
             
+            // Умножаем на бонусный множитель
+            clickValue *= clickBonusMultiplier;
+            
             // Шанс золотого клика
             let isGolden = false;
             if (Math.random() < upgrades.goldenClick.chance) {
@@ -1402,11 +1645,11 @@
         function startAutoClicker() {
             if (autoClickInterval) clearInterval(autoClickInterval);
             
-            if (!autoclickerEnabled) return;
+            if (!autoclickerEnabled || upgrades.autoClicker.level === 0) return;
             
             autoClickInterval = setInterval(() => {
                 if (upgrades.autoClicker.autoClicks > 0) {
-                    const autoClickValue = upgrades.autoClicker.autoClicks * upgrades.doubleClick.multiplier * rebirthMultiplier;
+                    const autoClickValue = upgrades.autoClicker.autoClicks * upgrades.doubleClick.multiplier * rebirthMultiplier * clickBonusMultiplier;
                     balance += autoClickValue;
                     totalEarned += autoClickValue;
                     localStorage.setItem('clickerBalance', balance);
@@ -1442,6 +1685,12 @@
                     doubleClick: { level: 0, cost: 100, multiplier: 1 },
                     goldenClick: { level: 0, cost: 200, chance: 0, maxLevel: 1 }
                 };
+                
+                // Сбрасываем настройки автокликера
+                autoclickerEnabled = false;
+                autoclickerToggle.checked = false;
+                autoclickerToggle.disabled = true;
+                localStorage.setItem('autoclickerEnabled', false);
                 
                 // Сохраняем данные
                 localStorage.setItem('clickerBalance', balance);
@@ -1511,6 +1760,10 @@
             statsModal.classList.remove('active');
         });
 
+        bonusOkBtn.addEventListener('click', () => {
+            bonusModal.classList.remove('active');
+        });
+
         // Закрытие модальных окон при клике вне их
         settingsModal.addEventListener('click', (e) => {
             if (e.target === settingsModal) {
@@ -1542,6 +1795,12 @@
             }
         });
 
+        bonusModal.addEventListener('click', (e) => {
+            if (e.target === bonusModal) {
+                bonusModal.classList.remove('active');
+            }
+        });
+
         // Сброс прогресса
         resetBtn.addEventListener('click', () => {
             confirmModal.classList.add('active');
@@ -1562,6 +1821,9 @@
                 doubleClick: { level: 0, cost: 100, multiplier: 1 },
                 goldenClick: { level: 0, cost: 200, chance: 0, maxLevel: 1 }
             };
+            autoclickerEnabled = false;
+            autoclickerToggle.checked = false;
+            autoclickerToggle.disabled = true;
             localStorage.setItem('clickerBalance', balance);
             localStorage.setItem('totalClicks', totalClicks);
             localStorage.setItem('totalEarned', totalEarned);
@@ -1571,6 +1833,7 @@
             localStorage.setItem('rebirthMultiplier', rebirthMultiplier);
             localStorage.setItem('priceMultiplier', priceMultiplier);
             localStorage.setItem('clickerUpgrades', JSON.stringify(upgrades));
+            localStorage.setItem('autoclickerEnabled', false);
             updateBalance();
             startAutoClicker();
             settingsModal.classList.remove('active');
@@ -1591,7 +1854,12 @@
 
         // Обработчики для переключателей настроек
         autoclickerToggle.checked = autoclickerEnabled;
+        autoclickerToggle.disabled = upgrades.autoClicker.level === 0; // Блокируем если не куплен
         autoclickerToggle.addEventListener('change', () => {
+            if (upgrades.autoClicker.level === 0) {
+                autoclickerToggle.checked = false;
+                return;
+            }
             autoclickerEnabled = autoclickerToggle.checked;
             localStorage.setItem('autoclickerEnabled', autoclickerEnabled);
             if (autoclickerEnabled) {
@@ -1607,8 +1875,12 @@
             localStorage.setItem('particlesEnabled', particlesEnabled);
             if (particlesEnabled) {
                 createParticles();
+                // Перезапускаем создание бонусных частиц
+                if (bonusParticleInterval) clearInterval(bonusParticleInterval);
+                bonusParticleInterval = setInterval(createBonusParticle, 120000);
             } else {
                 particlesContainer.innerHTML = '';
+                if (bonusParticleInterval) clearInterval(bonusParticleInterval);
             }
         });
 
@@ -1641,6 +1913,15 @@
                             localStorage.setItem('clickerBalance', balance);
                             localStorage.setItem('clickerUpgrades', JSON.stringify(upgrades));
                             updateBalance();
+                            
+                            // Разблокируем переключатель автокликера при покупке первого уровня
+                            if (this.level === 1) {
+                                autoclickerToggle.disabled = false;
+                                autoclickerToggle.checked = true;
+                                autoclickerEnabled = true;
+                                localStorage.setItem('autoclickerEnabled', true);
+                            }
+                            
                             startAutoClicker();
                             renderShopItems();
                         }
@@ -1738,6 +2019,9 @@
         updateBalance();
         createParticles();
         startAutoClicker();
+
+        // Запускаем создание бонусных частиц каждые 2 минуты
+        bonusParticleInterval = setInterval(createBonusParticle, 120000);
 
         // Запускаем обновление статистики
         statsInterval = setInterval(() => {
