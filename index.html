@@ -51,6 +51,13 @@
             margin-left: 5px;
         }
 
+        .rebirth-info {
+            margin-top: 10px;
+            font-size: 0.9rem;
+            color: #ffd700;
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+        }
+
         .main-content {
             display: flex;
             flex-direction: column;
@@ -242,6 +249,12 @@
             background: linear-gradient(135deg, #8e44ad, #7d3c98);
         }
 
+        #rebirth-btn:disabled {
+            background: #666;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
         .click-effect {
             position: absolute;
             width: 50px;
@@ -277,11 +290,18 @@
             position: absolute;
             width: 40px;
             height: 40px;
-            background-image: url('chastica.png');
             background-size: contain;
             background-repeat: no-repeat;
             animation: float 15s infinite linear;
             opacity: 0.7;
+        }
+
+        .particle.type1 {
+            background-image: url('chastica.png');
+        }
+
+        .particle.type2 {
+            background-image: url('chastica1.png');
         }
 
         @keyframes float {
@@ -709,6 +729,128 @@
             transform: translateY(-2px);
         }
 
+        /* Стили для перерождения */
+        .rebirth-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            z-index: 2000;
+        }
+
+        .rebirth-modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .rebirth-content {
+            background: linear-gradient(135deg, #2a2a4a, #1a1a3a);
+            border-radius: 20px;
+            padding: 30px;
+            width: 90%;
+            max-width: 450px;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.5);
+            transform: translateY(-50px);
+            transition: transform 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+        }
+
+        .rebirth-modal.active .rebirth-content {
+            transform: translateY(0);
+        }
+
+        .rebirth-icon {
+            font-size: 3rem;
+            color: #9b59b6;
+            margin-bottom: 20px;
+        }
+
+        .rebirth-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #fff;
+        }
+
+        .rebirth-info {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .rebirth-details {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+
+        .rebirth-detail {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+        }
+
+        .rebirth-detail:last-child {
+            margin-bottom: 0;
+        }
+
+        .rebirth-bonus {
+            color: #ffd700;
+            font-weight: bold;
+        }
+
+        .rebirth-cost {
+            color: #ff6b6b;
+            font-weight: bold;
+        }
+
+        .rebirth-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .rebirth-btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+            flex: 1;
+        }
+
+        .rebirth-confirm {
+            background: linear-gradient(135deg, #9b59b6, #8e44ad);
+            color: white;
+        }
+
+        .rebirth-confirm:hover {
+            background: linear-gradient(135deg, #8e44ad, #7d3c98);
+            transform: translateY(-2px);
+        }
+
+        .rebirth-cancel {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .rebirth-cancel:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
         /* Адаптация для телефонов */
         @media (max-width: 768px) {
             body {
@@ -769,15 +911,15 @@
                 width: 100%;
             }
             
-            .confirm-content {
+            .confirm-content, .rebirth-content {
                 padding: 25px;
             }
             
-            .confirm-buttons {
+            .confirm-buttons, .rebirth-buttons {
                 flex-direction: column;
             }
             
-            .confirm-btn {
+            .confirm-btn, .rebirth-btn {
                 width: 100%;
             }
             
@@ -840,6 +982,7 @@
     <div class="header">
         <div class="balance-container">
             <div class="balance" id="balance">0<span class="balance-symbol"> m$</span></div>
+            <div class="rebirth-info" id="rebirth-info">Перерождения: 0 | Множитель: x1</div>
         </div>
     </div>
 
@@ -983,6 +1126,14 @@
                     <span class="stats-label">Кликов в секунду:</span>
                     <span class="stats-value" id="clicks-per-second">0</span>
                 </div>
+                <div class="stats-item">
+                    <span class="stats-label">Перерождения:</span>
+                    <span class="stats-value" id="rebirth-count">0</span>
+                </div>
+                <div class="stats-item">
+                    <span class="stats-label">Общий множитель:</span>
+                    <span class="stats-value" id="total-multiplier">x1</span>
+                </div>
             </div>
             
             <div class="stats-section">
@@ -1029,6 +1180,39 @@
         </div>
     </div>
 
+    <!-- Модальное окно перерождения -->
+    <div class="rebirth-modal" id="rebirth-modal">
+        <div class="rebirth-content">
+            <div class="rebirth-icon">
+                <i class="fas fa-sync-alt"></i>
+            </div>
+            <h2 class="rebirth-title">Перерождение</h2>
+            <div class="rebirth-details">
+                <div class="rebirth-detail">
+                    <span>Текущий баланс:</span>
+                    <span id="current-balance">0 m$</span>
+                </div>
+                <div class="rebirth-detail">
+                    <span>Требуется для перерождения:</span>
+                    <span class="rebirth-cost" id="rebirth-cost">100k m$</span>
+                </div>
+                <div class="rebirth-detail">
+                    <span>Новый множитель:</span>
+                    <span class="rebirth-bonus" id="new-multiplier">x2</span>
+                </div>
+                <div class="rebirth-detail">
+                    <span>Потеря прогресса:</span>
+                    <span class="rebirth-cost">Все улучшения</span>
+                </div>
+            </div>
+            <p class="confirm-message">После перерождения вы потеряете все улучшения, но получите постоянный множитель дохода!</p>
+            <div class="rebirth-buttons">
+                <button class="rebirth-btn rebirth-confirm" id="rebirth-confirm">Переродиться</button>
+                <button class="rebirth-btn rebirth-cancel" id="rebirth-cancel">Отмена</button>
+            </div>
+        </div>
+    </div>
+
     <div class="particles-container" id="particles"></div>
 
     <script>
@@ -1045,19 +1229,25 @@
         const shopModal = document.getElementById('shop-modal');
         const statsModal = document.getElementById('stats-modal');
         const confirmModal = document.getElementById('confirm-modal');
+        const rebirthModal = document.getElementById('rebirth-modal');
         const closeSettingsBtn = document.getElementById('close-settings');
         const closeShopBtn = document.getElementById('close-shop');
         const closeStatsBtn = document.getElementById('close-stats');
         const resetBtn = document.getElementById('reset-btn');
         const confirmOkBtn = document.getElementById('confirm-ok');
         const confirmCancelBtn = document.getElementById('confirm-cancel');
+        const rebirthConfirmBtn = document.getElementById('rebirth-confirm');
+        const rebirthCancelBtn = document.getElementById('rebirth-cancel');
         const shopItemsContainer = document.getElementById('shop-items');
+        const rebirthInfoElement = document.getElementById('rebirth-info');
 
         // Статистика
         let totalClicks = parseInt(localStorage.getItem('totalClicks')) || 0;
         let totalEarned = parseInt(localStorage.getItem('totalEarned')) || 0;
         let playTime = parseInt(localStorage.getItem('playTime')) || 0;
         let goldenClicks = parseInt(localStorage.getItem('goldenClicks')) || 0;
+        let rebirthCount = parseInt(localStorage.getItem('rebirthCount')) || 0;
+        let rebirthMultiplier = parseFloat(localStorage.getItem('rebirthMultiplier')) || 1;
         let startTime = Date.now();
 
         // Загружаем баланс и улучшения из localStorage
@@ -1072,6 +1262,16 @@
         let autoClickInterval;
         let statsInterval;
 
+        // Функция для расчета стоимости перерождения
+        function getRebirthCost() {
+            return 100000 * Math.pow(2, rebirthCount); // 100k, 200k, 400k и т.д.
+        }
+
+        // Функция для расчета нового множителя
+        function getNewMultiplier() {
+            return rebirthMultiplier * 2; // Каждое перерождение удваивает множитель
+        }
+
         // Функция для форматирования чисел
         function formatNumber(num) {
             if (num >= 1000000) {
@@ -1085,6 +1285,11 @@
         // Обновляем отображение баланса
         function updateBalance() {
             balanceElement.textContent = formatNumber(balance);
+            rebirthInfoElement.textContent = `Перерождения: ${rebirthCount} | Множитель: x${rebirthMultiplier}`;
+            
+            // Обновляем состояние кнопки перерождения
+            const rebirthCost = getRebirthCost();
+            rebirthBtn.disabled = balance < rebirthCost;
         }
 
         // Функция для создания эффекта клика
@@ -1117,11 +1322,12 @@
         // Функция для создания частиц
         function createParticles() {
             particlesContainer.innerHTML = ''; // Очищаем контейнер
-            for (let i = 0; i < 15; i++) {
+            for (let i = 0; i < 20; i++) {
                 const particle = document.createElement('div');
                 particle.className = 'particle';
+                particle.classList.add(Math.random() > 0.5 ? 'type1' : 'type2');
                 particle.style.left = `${Math.random() * 100}vw`;
-                particle.style.animationDelay = `${Math.random() * 2}s`; // Уменьшаем задержку
+                particle.style.animationDelay = `${Math.random() * 2}s`;
                 particle.style.animationDuration = `${10 + Math.random() * 10}s`;
                 particlesContainer.appendChild(particle);
             }
@@ -1137,8 +1343,10 @@
             document.getElementById('total-earned').textContent = formatNumber(totalEarned) + ' m$';
             document.getElementById('play-time').textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
             document.getElementById('clicks-per-second').textContent = (totalClicks / Math.max(1, currentTime)).toFixed(1);
+            document.getElementById('rebirth-count').textContent = rebirthCount;
+            document.getElementById('total-multiplier').textContent = 'x' + rebirthMultiplier;
             document.getElementById('autoclicker-level').textContent = upgrades.autoClicker.level;
-            document.getElementById('click-multiplier').textContent = 'x' + upgrades.doubleClick.multiplier;
+            document.getElementById('click-multiplier').textContent = 'x' + (upgrades.doubleClick.multiplier * rebirthMultiplier);
             document.getElementById('golden-clicks').textContent = goldenClicks;
             
             const progress = Math.min(100, (balance / 1000000) * 100);
@@ -1146,10 +1354,20 @@
             document.getElementById('progress-bar-1m').style.width = progress + '%';
         }
 
+        // Функция для обновления модального окна перерождения
+        function updateRebirthModal() {
+            const rebirthCost = getRebirthCost();
+            const newMultiplier = getNewMultiplier();
+            
+            document.getElementById('current-balance').textContent = formatNumber(balance) + ' m$';
+            document.getElementById('rebirth-cost').textContent = formatNumber(rebirthCost) + ' m$';
+            document.getElementById('new-multiplier').textContent = 'x' + newMultiplier;
+        }
+
         // Обработчик клика по монете
         coinElement.addEventListener('click', (e) => {
-            // Базовый клик
-            let clickValue = 1;
+            // Базовый клик с учетом множителя перерождения
+            let clickValue = 1 * rebirthMultiplier;
             
             // Умножаем на множитель двойного клика
             clickValue *= upgrades.doubleClick.multiplier;
@@ -1195,7 +1413,7 @@
             
             autoClickInterval = setInterval(() => {
                 if (upgrades.autoClicker.autoClicks > 0) {
-                    const autoClickValue = upgrades.autoClicker.autoClicks * upgrades.doubleClick.multiplier;
+                    const autoClickValue = upgrades.autoClicker.autoClicks * upgrades.doubleClick.multiplier * rebirthMultiplier;
                     balance += autoClickValue;
                     totalEarned += autoClickValue;
                     localStorage.setItem('clickerBalance', balance);
@@ -1212,6 +1430,40 @@
                     showClickValueOnCoin(autoClickValue);
                 }
             }, 1000);
+        }
+
+        // Функция перерождения
+        function performRebirth() {
+            const rebirthCost = getRebirthCost();
+            
+            if (balance >= rebirthCost) {
+                // Увеличиваем счетчик перерождений
+                rebirthCount++;
+                rebirthMultiplier = getNewMultiplier();
+                
+                // Сбрасываем прогресс
+                balance = 0;
+                upgrades = {
+                    autoClicker: { level: 0, cost: 50, autoClicks: 0 },
+                    doubleClick: { level: 0, cost: 100, multiplier: 1 },
+                    goldenClick: { level: 0, cost: 200, chance: 0, maxLevel: 1 }
+                };
+                
+                // Сохраняем данные
+                localStorage.setItem('clickerBalance', balance);
+                localStorage.setItem('clickerUpgrades', JSON.stringify(upgrades));
+                localStorage.setItem('rebirthCount', rebirthCount);
+                localStorage.setItem('rebirthMultiplier', rebirthMultiplier);
+                
+                // Обновляем отображение
+                updateBalance();
+                startAutoClicker();
+                
+                // Закрываем модальное окно
+                rebirthModal.classList.remove('active');
+                
+                alert(`Перерождение успешно! Теперь у вас множитель x${rebirthMultiplier}`);
+            }
         }
 
         // Обработчик движения мыши для эффекта наведения
@@ -1246,9 +1498,14 @@
             updateStats();
         });
 
-        // Заглушки для новых кнопок
         rebirthBtn.addEventListener('click', () => {
-            alert('Функция перерождения скоро будет доступна!');
+            const rebirthCost = getRebirthCost();
+            if (balance >= rebirthCost) {
+                rebirthModal.classList.add('active');
+                updateRebirthModal();
+            } else {
+                alert(`Для перерождения нужно накопить ${formatNumber(rebirthCost)} m$!`);
+            }
         });
 
         // Закрытие модальных окон
@@ -1289,6 +1546,12 @@
             }
         });
 
+        rebirthModal.addEventListener('click', (e) => {
+            if (e.target === rebirthModal) {
+                rebirthModal.classList.remove('active');
+            }
+        });
+
         // Сброс прогресса
         resetBtn.addEventListener('click', () => {
             confirmModal.classList.add('active');
@@ -1300,6 +1563,8 @@
             totalEarned = 0;
             playTime = 0;
             goldenClicks = 0;
+            rebirthCount = 0;
+            rebirthMultiplier = 1;
             startTime = Date.now();
             upgrades = {
                 autoClicker: { level: 0, cost: 50, autoClicks: 0 },
@@ -1311,6 +1576,8 @@
             localStorage.setItem('totalEarned', totalEarned);
             localStorage.setItem('playTime', playTime);
             localStorage.setItem('goldenClicks', goldenClicks);
+            localStorage.setItem('rebirthCount', rebirthCount);
+            localStorage.setItem('rebirthMultiplier', rebirthMultiplier);
             localStorage.setItem('clickerUpgrades', JSON.stringify(upgrades));
             updateBalance();
             startAutoClicker();
@@ -1320,6 +1587,14 @@
 
         confirmCancelBtn.addEventListener('click', () => {
             confirmModal.classList.remove('active');
+        });
+
+        rebirthConfirmBtn.addEventListener('click', () => {
+            performRebirth();
+        });
+
+        rebirthCancelBtn.addEventListener('click', () => {
+            rebirthModal.classList.remove('active');
         });
 
         // Функция рендера товаров в магазине
