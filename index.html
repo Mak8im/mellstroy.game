@@ -483,27 +483,140 @@
             margin-left: 10px;
         }
 
-        @media (max-width: 600px) {
-            .coin {
-                width: 150px;
-                height: 150px;
+        /* Стили для подтверждения сброса */
+        .confirm-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            z-index: 2000;
+        }
+
+        .confirm-modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .confirm-content {
+            background: linear-gradient(135deg, #2a2a4a, #1a1a3a);
+            border-radius: 20px;
+            padding: 30px;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.5);
+            transform: translateY(-50px);
+            transition: transform 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+        }
+
+        .confirm-modal.active .confirm-content {
+            transform: translateY(0);
+        }
+
+        .confirm-icon {
+            font-size: 3rem;
+            color: #ff6b6b;
+            margin-bottom: 20px;
+        }
+
+        .confirm-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #fff;
+        }
+
+        .confirm-message {
+            font-size: 1rem;
+            margin-bottom: 25px;
+            color: #ccc;
+            line-height: 1.5;
+        }
+
+        .confirm-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .confirm-btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+            flex: 1;
+        }
+
+        .confirm-ok {
+            background: linear-gradient(135deg, #ff6b6b, #ff5252);
+            color: white;
+        }
+
+        .confirm-ok:hover {
+            background: linear-gradient(135deg, #ff5252, #ff3838);
+            transform: translateY(-2px);
+        }
+
+        .confirm-cancel {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .confirm-cancel:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        /* Адаптация для телефонов */
+        @media (max-width: 768px) {
+            body {
+                padding: 15px;
             }
             
             .balance {
                 font-size: 2rem;
             }
             
-            .btn {
-                padding: 12px 20px;
-                font-size: 1rem;
+            .balance-container {
+                padding: 12px 25px;
+            }
+            
+            .coin {
+                width: 160px;
+                height: 160px;
             }
             
             .bottom-panel {
                 padding: 20px;
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .btn {
+                padding: 12px 20px;
+                font-size: 1rem;
+                width: 100%;
+                justify-content: center;
             }
             
             .modal-content {
                 padding: 20px;
+            }
+            
+            .modal-title {
+                font-size: 1.5rem;
             }
             
             .shop-item {
@@ -514,6 +627,70 @@
             .shop-item-btn {
                 margin-top: 10px;
                 width: 100%;
+            }
+            
+            .setting-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+            
+            .volume-slider {
+                width: 100%;
+            }
+            
+            .confirm-content {
+                padding: 25px;
+            }
+            
+            .confirm-buttons {
+                flex-direction: column;
+            }
+            
+            .confirm-btn {
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .balance {
+                font-size: 1.8rem;
+            }
+            
+            .coin {
+                width: 140px;
+                height: 140px;
+            }
+            
+            .modal-content {
+                padding: 15px;
+            }
+            
+            .modal-title {
+                font-size: 1.3rem;
+            }
+            
+            .settings-section-title {
+                font-size: 1.1rem;
+            }
+            
+            .shop-item-title {
+                font-size: 1.1rem;
+            }
+        }
+
+        /* Отключение hover эффектов на тач-устройствах */
+        @media (hover: none) {
+            .btn:hover {
+                transform: none;
+            }
+            
+            .shop-item:hover {
+                transform: none;
+            }
+            
+            .coin:hover {
+                transform: none;
             }
         }
     </style>
@@ -631,6 +808,21 @@
         </div>
     </div>
 
+    <!-- Модальное окно подтверждения сброса -->
+    <div class="confirm-modal" id="confirm-modal">
+        <div class="confirm-content">
+            <div class="confirm-icon">
+                <i class="fas fa-exclamation-triangle"></i>
+            </div>
+            <h2 class="confirm-title">Подтвердите действие</h2>
+            <p class="confirm-message">Вы уверены, что хотите сбросить весь прогресс? Это действие нельзя отменить.</p>
+            <div class="confirm-buttons">
+                <button class="confirm-btn confirm-ok" id="confirm-ok">OK</button>
+                <button class="confirm-btn confirm-cancel" id="confirm-cancel">Отмена</button>
+            </div>
+        </div>
+    </div>
+
     <div class="particles-container" id="particles"></div>
 
     <script>
@@ -642,9 +834,12 @@
         const particlesContainer = document.getElementById('particles');
         const settingsModal = document.getElementById('settings-modal');
         const shopModal = document.getElementById('shop-modal');
+        const confirmModal = document.getElementById('confirm-modal');
         const closeSettingsBtn = document.getElementById('close-settings');
         const closeShopBtn = document.getElementById('close-shop');
         const resetBtn = document.getElementById('reset-btn');
+        const confirmOkBtn = document.getElementById('confirm-ok');
+        const confirmCancelBtn = document.getElementById('confirm-cancel');
         const shopItemsContainer = document.getElementById('shop-items');
 
         // Загружаем баланс и улучшения из localStorage
@@ -791,22 +986,34 @@
             }
         });
 
+        confirmModal.addEventListener('click', (e) => {
+            if (e.target === confirmModal) {
+                confirmModal.classList.remove('active');
+            }
+        });
+
         // Сброс прогресса
         resetBtn.addEventListener('click', () => {
-            if (confirm('Вы уверены, что хотите сбросить весь прогресс? Это действие нельзя отменить.')) {
-                balance = 0;
-                upgrades = {
-                    autoClicker: { level: 0, cost: 50, autoClicks: 0 },
-                    doubleClick: { level: 0, cost: 100, multiplier: 1 },
-                    goldenClick: { level: 0, cost: 200, chance: 0 }
-                };
-                localStorage.setItem('clickerBalance', balance);
-                localStorage.setItem('clickerUpgrades', JSON.stringify(upgrades));
-                updateBalance();
-                startAutoClicker();
-                settingsModal.classList.remove('active');
-                alert('Прогресс сброшен!');
-            }
+            confirmModal.classList.add('active');
+        });
+
+        confirmOkBtn.addEventListener('click', () => {
+            balance = 0;
+            upgrades = {
+                autoClicker: { level: 0, cost: 50, autoClicks: 0 },
+                doubleClick: { level: 0, cost: 100, multiplier: 1 },
+                goldenClick: { level: 0, cost: 200, chance: 0 }
+            };
+            localStorage.setItem('clickerBalance', balance);
+            localStorage.setItem('clickerUpgrades', JSON.stringify(upgrades));
+            updateBalance();
+            startAutoClicker();
+            settingsModal.classList.remove('active');
+            confirmModal.classList.remove('active');
+        });
+
+        confirmCancelBtn.addEventListener('click', () => {
+            confirmModal.classList.remove('active');
         });
 
         // Функция рендера товаров в магазине
