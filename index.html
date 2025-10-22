@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Игра для Меллстроя</title>
-    <link rel="icon" href="icon.ico" type="image/x-icon">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🪙</text></svg>">
     <style>
         * {
             margin: 0;
@@ -282,12 +282,12 @@
 
         .particle {
             position: absolute;
-            width: 30px;
-            height: 30px;
+            width: 40px;
+            height: 40px;
             background-size: contain;
             background-repeat: no-repeat;
             animation: float 15s infinite linear;
-            opacity: 0.6;
+            opacity: 0.7;
         }
 
         .particle.type1 {
@@ -316,10 +316,10 @@
                 opacity: 0;
             }
             10% {
-                opacity: 0.6;
+                opacity: 0.7;
             }
             90% {
-                opacity: 0.6;
+                opacity: 0.7;
             }
             100% {
                 transform: translateY(-100px) rotate(360deg);
@@ -946,8 +946,8 @@
             }
             
             .particle {
-                width: 25px;
-                height: 25px;
+                width: 30px;
+                height: 30px;
             }
         }
 
@@ -978,8 +978,8 @@
             }
             
             .particle {
-                width: 20px;
-                height: 20px;
+                width: 25px;
+                height: 25px;
             }
         }
 
@@ -1172,10 +1172,6 @@
                     <span class="stats-label">Золотые клики:</span>
                     <span class="stats-value" id="golden-clicks">0</span>
                 </div>
-                <div class="stats-item">
-                    <span class="stats-label">Уровень удачи:</span>
-                    <span class="stats-value" id="luck-level">0</span>
-                </div>
             </div>
             
             <div class="stats-section">
@@ -1290,8 +1286,7 @@
         let upgrades = JSON.parse(localStorage.getItem('clickerUpgrades')) || {
             autoClicker: { level: 0, cost: 50, autoClicks: 0 },
             doubleClick: { level: 0, cost: 100, multiplier: 1 },
-            goldenClick: { level: 0, cost: 200, chance: 0, maxLevel: 1 },
-            luckBoost: { level: 0, cost: 300, bonus: 0, maxLevel: 5 }
+            goldenClick: { level: 0, cost: 200, chance: 0, maxLevel: 1 }
         };
 
         // Автокликер
@@ -1359,14 +1354,14 @@
         // Функция для создания частиц
         function createParticles() {
             particlesContainer.innerHTML = ''; // Очищаем контейнер
-            for (let i = 0; i < 50; i++) { // Увеличили количество частиц до 50
+            for (let i = 0; i < 25; i++) {
                 const particle = document.createElement('div');
                 particle.className = 'particle';
                 const particleType = Math.floor(Math.random() * 5) + 1;
                 particle.classList.add(`type${particleType}`);
                 particle.style.left = `${Math.random() * 100}vw`;
                 particle.style.animationDelay = `${Math.random() * 2}s`;
-                particle.style.animationDuration = `${8 + Math.random() * 8}s`; // Более быстрая анимация
+                particle.style.animationDuration = `${10 + Math.random() * 10}s`;
                 particlesContainer.appendChild(particle);
             }
         }
@@ -1386,7 +1381,6 @@
             document.getElementById('autoclicker-level').textContent = upgrades.autoClicker.level;
             document.getElementById('click-multiplier').textContent = 'x' + (upgrades.doubleClick.multiplier * rebirthMultiplier);
             document.getElementById('golden-clicks').textContent = goldenClicks;
-            document.getElementById('luck-level').textContent = upgrades.luckBoost.level;
             
             const progress = Math.min(100, (balance / 1000000) * 100);
             document.getElementById('progress-1m').textContent = progress.toFixed(1) + '%';
@@ -1415,9 +1409,6 @@
             
             // Умножаем на множитель двойного клика
             clickValue *= upgrades.doubleClick.multiplier;
-            
-            // Бонус удачи (увеличивает базовый доход)
-            clickValue *= (1 + upgrades.luckBoost.bonus);
             
             // Шанс золотого клика
             let isGolden = false;
@@ -1460,9 +1451,7 @@
             
             autoClickInterval = setInterval(() => {
                 if (upgrades.autoClicker.autoClicks > 0) {
-                    let autoClickValue = upgrades.autoClicker.autoClicks * upgrades.doubleClick.multiplier * rebirthMultiplier;
-                    autoClickValue *= (1 + upgrades.luckBoost.bonus); // Бонус удачи
-                    
+                    const autoClickValue = upgrades.autoClicker.autoClicks * upgrades.doubleClick.multiplier * rebirthMultiplier;
                     balance += autoClickValue;
                     totalEarned += autoClickValue;
                     localStorage.setItem('clickerBalance', balance);
@@ -1496,8 +1485,7 @@
                 upgrades = {
                     autoClicker: { level: 0, cost: 50, autoClicks: 0 },
                     doubleClick: { level: 0, cost: 100, multiplier: 1 },
-                    goldenClick: { level: 0, cost: 200, chance: 0, maxLevel: 1 },
-                    luckBoost: { level: 0, cost: 300, bonus: 0, maxLevel: 5 }
+                    goldenClick: { level: 0, cost: 200, chance: 0, maxLevel: 1 }
                 };
                 
                 // Сохраняем данные
@@ -1617,8 +1605,7 @@
             upgrades = {
                 autoClicker: { level: 0, cost: 50, autoClicks: 0 },
                 doubleClick: { level: 0, cost: 100, multiplier: 1 },
-                goldenClick: { level: 0, cost: 200, chance: 0, maxLevel: 1 },
-                luckBoost: { level: 0, cost: 300, bonus: 0, maxLevel: 5 }
+                goldenClick: { level: 0, cost: 200, chance: 0, maxLevel: 1 }
             };
             localStorage.setItem('clickerBalance', balance);
             localStorage.setItem('totalClicks', totalClicks);
@@ -1730,34 +1717,6 @@
                             upgrades.goldenClick.level = this.level;
                             upgrades.goldenClick.chance = 0.02; // 2% шанс
                             upgrades.goldenClick.cost = this.getCost();
-                            localStorage.setItem('clickerBalance', balance);
-                            localStorage.setItem('clickerUpgrades', JSON.stringify(upgrades));
-                            updateBalance();
-                            renderShopItems();
-                        }
-                    }
-                },
-                {
-                    id: 'luckBoost',
-                    title: 'Удача',
-                    description: 'Увеличивает базовый доход от кликов',
-                    baseCost: 300,
-                    level: upgrades.luckBoost.level,
-                    maxLevel: 5,
-                    getCost: function() {
-                        return Math.floor(this.baseCost * Math.pow(2, this.level) * priceMultiplier);
-                    },
-                    effect: function() {
-                        return `+${this.level * 10}% к доходу`;
-                    },
-                    buy: function() {
-                        const cost = this.getCost();
-                        if (balance >= cost && this.level < this.maxLevel) {
-                            balance -= cost;
-                            this.level++;
-                            upgrades.luckBoost.level = this.level;
-                            upgrades.luckBoost.bonus = this.level * 0.1; // +10% за уровень
-                            upgrades.luckBoost.cost = this.getCost();
                             localStorage.setItem('clickerBalance', balance);
                             localStorage.setItem('clickerUpgrades', JSON.stringify(upgrades));
                             updateBalance();
