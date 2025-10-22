@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Игра для Меллстроя</title>
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🪙</text></svg>">
+    <link rel="icon" href="icon.ico" type="image/x-icon">
     <style>
         * {
             margin: 0;
@@ -481,24 +481,6 @@
             transform: translateX(26px);
         }
 
-        .volume-slider {
-            width: 150px;
-            height: 5px;
-            -webkit-appearance: none;
-            background: #444;
-            border-radius: 5px;
-            outline: none;
-        }
-
-        .volume-slider::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            width: 18px;
-            height: 18px;
-            border-radius: 50%;
-            background: #4facfe;
-            cursor: pointer;
-        }
-
         .reset-btn, .stats-btn {
             background: linear-gradient(135deg, #ff6b6b, #ff5252);
             color: white;
@@ -929,10 +911,6 @@
                 gap: 10px;
             }
             
-            .volume-slider {
-                width: 100%;
-            }
-            
             .confirm-content, .rebirth-content {
                 padding: 25px;
             }
@@ -1044,51 +1022,18 @@
             </div>
             
             <div class="settings-section">
-                <h3 class="settings-section-title">Звук</h3>
-                <div class="setting-item">
-                    <span class="setting-label">Звуки кликов</span>
-                    <label class="toggle-switch">
-                        <input type="checkbox" id="sound-toggle" checked>
-                        <span class="slider"></span>
-                    </label>
-                </div>
-                <div class="setting-item">
-                    <span class="setting-label">Громкость</span>
-                    <input type="range" min="0" max="100" value="80" class="volume-slider" id="volume-slider">
-                </div>
-            </div>
-            
-            <div class="settings-section">
-                <h3 class="settings-section-title">Внешний вид</h3>
-                <div class="setting-item">
-                    <span class="setting-label">Темная тема</span>
-                    <label class="toggle-switch">
-                        <input type="checkbox" id="theme-toggle" checked>
-                        <span class="slider"></span>
-                    </label>
-                </div>
-                <div class="setting-item">
-                    <span class="setting-label">Анимации</span>
-                    <label class="toggle-switch">
-                        <input type="checkbox" id="animations-toggle" checked>
-                        <span class="slider"></span>
-                    </label>
-                </div>
-            </div>
-            
-            <div class="settings-section">
                 <h3 class="settings-section-title">Игровой процесс</h3>
                 <div class="setting-item">
                     <span class="setting-label">Авто-кликер</span>
                     <label class="toggle-switch">
-                        <input type="checkbox" id="autoclicker-toggle">
+                        <input type="checkbox" id="autoclicker-toggle" checked>
                         <span class="slider"></span>
                     </label>
                 </div>
                 <div class="setting-item">
-                    <span class="setting-label">Уведомления</span>
+                    <span class="setting-label">Частицы</span>
                     <label class="toggle-switch">
-                        <input type="checkbox" id="notifications-toggle" checked>
+                        <input type="checkbox" id="particles-toggle" checked>
                         <span class="slider"></span>
                     </label>
                 </div>
@@ -1270,6 +1215,8 @@
         const rebirthCancelBtn = document.getElementById('rebirth-cancel');
         const shopItemsContainer = document.getElementById('shop-items');
         const rebirthInfoElement = document.getElementById('rebirth-info');
+        const autoclickerToggle = document.getElementById('autoclicker-toggle');
+        const particlesToggle = document.getElementById('particles-toggle');
 
         // Статистика
         let totalClicks = parseInt(localStorage.getItem('totalClicks')) || 0;
@@ -1280,6 +1227,10 @@
         let rebirthMultiplier = parseFloat(localStorage.getItem('rebirthMultiplier')) || 1;
         let priceMultiplier = parseFloat(localStorage.getItem('priceMultiplier')) || 1;
         let startTime = Date.now();
+
+        // Настройки из localStorage
+        let autoclickerEnabled = localStorage.getItem('autoclickerEnabled') !== 'false'; // по умолчанию включен
+        let particlesEnabled = localStorage.getItem('particlesEnabled') !== 'false'; // по умолчанию включены
 
         // Загружаем баланс и улучшения из localStorage
         let balance = parseInt(localStorage.getItem('clickerBalance')) || 0;
@@ -1353,6 +1304,8 @@
 
         // Функция для создания частиц
         function createParticles() {
+            if (!particlesEnabled) return;
+            
             particlesContainer.innerHTML = ''; // Очищаем контейнер
             for (let i = 0; i < 25; i++) {
                 const particle = document.createElement('div');
@@ -1448,6 +1401,8 @@
         // Функция автокликера
         function startAutoClicker() {
             if (autoClickInterval) clearInterval(autoClickInterval);
+            
+            if (!autoclickerEnabled) return;
             
             autoClickInterval = setInterval(() => {
                 if (upgrades.autoClicker.autoClicks > 0) {
@@ -1632,6 +1587,29 @@
 
         rebirthCancelBtn.addEventListener('click', () => {
             rebirthModal.classList.remove('active');
+        });
+
+        // Обработчики для переключателей настроек
+        autoclickerToggle.checked = autoclickerEnabled;
+        autoclickerToggle.addEventListener('change', () => {
+            autoclickerEnabled = autoclickerToggle.checked;
+            localStorage.setItem('autoclickerEnabled', autoclickerEnabled);
+            if (autoclickerEnabled) {
+                startAutoClicker();
+            } else {
+                if (autoClickInterval) clearInterval(autoClickInterval);
+            }
+        });
+
+        particlesToggle.checked = particlesEnabled;
+        particlesToggle.addEventListener('change', () => {
+            particlesEnabled = particlesToggle.checked;
+            localStorage.setItem('particlesEnabled', particlesEnabled);
+            if (particlesEnabled) {
+                createParticles();
+            } else {
+                particlesContainer.innerHTML = '';
+            }
         });
 
         // Функция рендера товаров в магазине
