@@ -249,12 +249,6 @@
             background: linear-gradient(135deg, #8e44ad, #7d3c98);
         }
 
-        #rebirth-btn:disabled {
-            background: #666;
-            cursor: not-allowed;
-            opacity: 0.6;
-        }
-
         .click-effect {
             position: absolute;
             width: 50px;
@@ -302,6 +296,18 @@
 
         .particle.type2 {
             background-image: url('chastica1.png');
+        }
+
+        .particle.type3 {
+            background-image: url('chastica2.png');
+        }
+
+        .particle.type4 {
+            background-image: url('chastica3.png');
+        }
+
+        .particle.type5 {
+            background-image: url('chastica4.png');
         }
 
         @keyframes float {
@@ -814,6 +820,16 @@
             font-weight: bold;
         }
 
+        .rebirth-available {
+            color: #4CAF50;
+            font-weight: bold;
+        }
+
+        .rebirth-unavailable {
+            color: #ff6b6b;
+            font-weight: bold;
+        }
+
         .rebirth-buttons {
             display: flex;
             justify-content: center;
@@ -836,9 +852,15 @@
             color: white;
         }
 
-        .rebirth-confirm:hover {
+        .rebirth-confirm:hover:not(:disabled) {
             background: linear-gradient(135deg, #8e44ad, #7d3c98);
             transform: translateY(-2px);
+        }
+
+        .rebirth-confirm:disabled {
+            background: #666;
+            cursor: not-allowed;
+            opacity: 0.6;
         }
 
         .rebirth-cancel {
@@ -1197,6 +1219,10 @@
                     <span class="rebirth-cost" id="rebirth-cost">100k m$</span>
                 </div>
                 <div class="rebirth-detail">
+                    <span>Доступно:</span>
+                    <span class="rebirth-available" id="rebirth-available">Нет</span>
+                </div>
+                <div class="rebirth-detail">
                     <span>Новый множитель:</span>
                     <span class="rebirth-bonus" id="new-multiplier">x2</span>
                 </div>
@@ -1204,10 +1230,14 @@
                     <span>Потеря прогресса:</span>
                     <span class="rebirth-cost">Все улучшения</span>
                 </div>
+                <div class="rebirth-detail">
+                    <span>Новые цены в магазине:</span>
+                    <span class="rebirth-cost">+20%</span>
+                </div>
             </div>
             <p class="confirm-message">После перерождения вы потеряете все улучшения, но получите постоянный множитель дохода!</p>
             <div class="rebirth-buttons">
-                <button class="rebirth-btn rebirth-confirm" id="rebirth-confirm">Переродиться</button>
+                <button class="rebirth-btn rebirth-confirm" id="rebirth-confirm" disabled>Переродиться</button>
                 <button class="rebirth-btn rebirth-cancel" id="rebirth-cancel">Отмена</button>
             </div>
         </div>
@@ -1248,6 +1278,7 @@
         let goldenClicks = parseInt(localStorage.getItem('goldenClicks')) || 0;
         let rebirthCount = parseInt(localStorage.getItem('rebirthCount')) || 0;
         let rebirthMultiplier = parseFloat(localStorage.getItem('rebirthMultiplier')) || 1;
+        let priceMultiplier = parseFloat(localStorage.getItem('priceMultiplier')) || 1;
         let startTime = Date.now();
 
         // Загружаем баланс и улучшения из localStorage
@@ -1272,6 +1303,11 @@
             return rebirthMultiplier * 2; // Каждое перерождение удваивает множитель
         }
 
+        // Функция для расчета нового множителя цен
+        function getNewPriceMultiplier() {
+            return priceMultiplier * 1.2; // Каждое перерождение увеличивает цены на 20%
+        }
+
         // Функция для форматирования чисел
         function formatNumber(num) {
             if (num >= 1000000) {
@@ -1286,10 +1322,6 @@
         function updateBalance() {
             balanceElement.textContent = formatNumber(balance);
             rebirthInfoElement.textContent = `Перерождения: ${rebirthCount} | Множитель: x${rebirthMultiplier}`;
-            
-            // Обновляем состояние кнопки перерождения
-            const rebirthCost = getRebirthCost();
-            rebirthBtn.disabled = balance < rebirthCost;
         }
 
         // Функция для создания эффекта клика
@@ -1322,10 +1354,11 @@
         // Функция для создания частиц
         function createParticles() {
             particlesContainer.innerHTML = ''; // Очищаем контейнер
-            for (let i = 0; i < 20; i++) {
+            for (let i = 0; i < 25; i++) {
                 const particle = document.createElement('div');
                 particle.className = 'particle';
-                particle.classList.add(Math.random() > 0.5 ? 'type1' : 'type2');
+                const particleType = Math.floor(Math.random() * 5) + 1;
+                particle.classList.add(`type${particleType}`);
                 particle.style.left = `${Math.random() * 100}vw`;
                 particle.style.animationDelay = `${Math.random() * 2}s`;
                 particle.style.animationDuration = `${10 + Math.random() * 10}s`;
@@ -1358,10 +1391,15 @@
         function updateRebirthModal() {
             const rebirthCost = getRebirthCost();
             const newMultiplier = getNewMultiplier();
+            const canRebirth = balance >= rebirthCost;
             
             document.getElementById('current-balance').textContent = formatNumber(balance) + ' m$';
             document.getElementById('rebirth-cost').textContent = formatNumber(rebirthCost) + ' m$';
+            document.getElementById('rebirth-available').textContent = canRebirth ? 'Да' : 'Нет';
+            document.getElementById('rebirth-available').className = canRebirth ? 'rebirth-available' : 'rebirth-unavailable';
             document.getElementById('new-multiplier').textContent = 'x' + newMultiplier;
+            
+            rebirthConfirmBtn.disabled = !canRebirth;
         }
 
         // Обработчик клика по монете
@@ -1440,6 +1478,7 @@
                 // Увеличиваем счетчик перерождений
                 rebirthCount++;
                 rebirthMultiplier = getNewMultiplier();
+                priceMultiplier = getNewPriceMultiplier();
                 
                 // Сбрасываем прогресс
                 balance = 0;
@@ -1454,6 +1493,7 @@
                 localStorage.setItem('clickerUpgrades', JSON.stringify(upgrades));
                 localStorage.setItem('rebirthCount', rebirthCount);
                 localStorage.setItem('rebirthMultiplier', rebirthMultiplier);
+                localStorage.setItem('priceMultiplier', priceMultiplier);
                 
                 // Обновляем отображение
                 updateBalance();
@@ -1462,7 +1502,7 @@
                 // Закрываем модальное окно
                 rebirthModal.classList.remove('active');
                 
-                alert(`Перерождение успешно! Теперь у вас множитель x${rebirthMultiplier}`);
+                alert(`Перерождение успешно! Теперь у вас множитель x${rebirthMultiplier} и цены в магазине увеличены на 20%`);
             }
         }
 
@@ -1499,13 +1539,8 @@
         });
 
         rebirthBtn.addEventListener('click', () => {
-            const rebirthCost = getRebirthCost();
-            if (balance >= rebirthCost) {
-                rebirthModal.classList.add('active');
-                updateRebirthModal();
-            } else {
-                alert(`Для перерождения нужно накопить ${formatNumber(rebirthCost)} m$!`);
-            }
+            rebirthModal.classList.add('active');
+            updateRebirthModal();
         });
 
         // Закрытие модальных окон
@@ -1565,6 +1600,7 @@
             goldenClicks = 0;
             rebirthCount = 0;
             rebirthMultiplier = 1;
+            priceMultiplier = 1;
             startTime = Date.now();
             upgrades = {
                 autoClicker: { level: 0, cost: 50, autoClicks: 0 },
@@ -1578,6 +1614,7 @@
             localStorage.setItem('goldenClicks', goldenClicks);
             localStorage.setItem('rebirthCount', rebirthCount);
             localStorage.setItem('rebirthMultiplier', rebirthMultiplier);
+            localStorage.setItem('priceMultiplier', priceMultiplier);
             localStorage.setItem('clickerUpgrades', JSON.stringify(upgrades));
             updateBalance();
             startAutoClicker();
@@ -1610,7 +1647,7 @@
                     level: upgrades.autoClicker.level,
                     maxLevel: 10,
                     getCost: function() {
-                        return Math.floor(this.baseCost * Math.pow(1.5, this.level));
+                        return Math.floor(this.baseCost * Math.pow(1.5, this.level) * priceMultiplier);
                     },
                     effect: function() {
                         return `+${this.level} кликов/сек`;
@@ -1639,7 +1676,7 @@
                     level: upgrades.doubleClick.level,
                     maxLevel: 5,
                     getCost: function() {
-                        return Math.floor(this.baseCost * Math.pow(2, this.level));
+                        return Math.floor(this.baseCost * Math.pow(2, this.level) * priceMultiplier);
                     },
                     effect: function() {
                         return `x${1 + this.level} к кликам`;
@@ -1667,7 +1704,7 @@
                     level: upgrades.goldenClick.level,
                     maxLevel: 1,
                     getCost: function() {
-                        return this.baseCost;
+                        return Math.floor(this.baseCost * priceMultiplier);
                     },
                     effect: function() {
                         return `${2}% шанс`;
