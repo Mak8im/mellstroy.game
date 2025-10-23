@@ -855,6 +855,218 @@
             transform: translateY(-2px);
         }
 
+        /* Стили для админ-панели */
+        .admin-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            z-index: 3000;
+        }
+
+        .admin-modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .admin-content {
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            border-radius: 20px;
+            padding: 30px;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.7);
+            transform: translateY(-50px);
+            transition: transform 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+        }
+
+        .admin-modal.active .admin-content {
+            transform: translateY(0);
+        }
+
+        .admin-icon {
+            font-size: 3rem;
+            color: #ff6b6b;
+            margin-bottom: 20px;
+        }
+
+        .admin-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: #fff;
+        }
+
+        .admin-input-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .admin-label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 1rem;
+            color: #ccc;
+        }
+
+        .admin-input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .admin-input:focus {
+            outline: none;
+            border-color: #4facfe;
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .admin-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 25px;
+        }
+
+        .admin-btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+            flex: 1;
+        }
+
+        .admin-login {
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            color: white;
+        }
+
+        .admin-login:hover {
+            background: linear-gradient(135deg, #45a049, #3d8b40);
+            transform: translateY(-2px);
+        }
+
+        .admin-cancel {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .admin-cancel:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .admin-panel {
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            border-radius: 20px;
+            padding: 30px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.7);
+            transform: translateY(-50px);
+            transition: transform 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .admin-panel.active {
+            transform: translateY(0);
+        }
+
+        .admin-section {
+            margin-bottom: 25px;
+        }
+
+        .admin-section-title {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: #4facfe;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            padding-bottom: 10px;
+        }
+
+        .admin-balance-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .admin-balance-input {
+            flex: 1;
+            padding: 10px 15px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 1rem;
+        }
+
+        .admin-balance-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #4facfe, #00f2fe);
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+        }
+
+        .admin-balance-btn:hover {
+            background: linear-gradient(135deg, #3a9dfc, #00d9fe);
+            transform: translateY(-2px);
+        }
+
+        .admin-action-btn {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #ff6b6b, #ff5252);
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .admin-action-btn:hover {
+            background: linear-gradient(135deg, #ff5252, #ff3838);
+            transform: translateY(-2px);
+        }
+
+        .admin-message {
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #4CAF50;
+            font-size: 0.9rem;
+            text-align: center;
+            display: none;
+        }
+
+        .admin-message.error {
+            color: #ff6b6b;
+        }
+
         /* Адаптация для телефонов */
         @media (max-width: 768px) {
             body {
@@ -911,21 +1123,25 @@
                 gap: 10px;
             }
             
-            .confirm-content, .rebirth-content {
+            .confirm-content, .rebirth-content, .admin-content, .admin-panel {
                 padding: 25px;
             }
             
-            .confirm-buttons, .rebirth-buttons {
+            .confirm-buttons, .rebirth-buttons, .admin-buttons {
                 flex-direction: column;
             }
             
-            .confirm-btn, .rebirth-btn {
+            .confirm-btn, .rebirth-btn, .admin-btn {
                 width: 100%;
             }
             
             .particle {
                 width: 30px;
                 height: 30px;
+            }
+            
+            .admin-balance-controls {
+                flex-direction: column;
             }
         }
 
@@ -972,6 +1188,18 @@
             }
             
             .coin:hover {
+                transform: none;
+            }
+            
+            .admin-btn:hover {
+                transform: none;
+            }
+            
+            .admin-balance-btn:hover {
+                transform: none;
+            }
+            
+            .admin-action-btn:hover {
                 transform: none;
             }
         }
@@ -1192,6 +1420,62 @@
         </div>
     </div>
 
+    <!-- Модальное окно админ-панели -->
+    <div class="admin-modal" id="admin-modal">
+        <div class="admin-content">
+            <div class="admin-icon">
+                <i class="fas fa-lock"></i>
+            </div>
+            <h2 class="admin-title">Админ-панель</h2>
+            <div class="admin-input-group">
+                <label class="admin-label">Логин:</label>
+                <input type="text" class="admin-input" id="admin-login" placeholder="Введите логин">
+            </div>
+            <div class="admin-input-group">
+                <label class="admin-label">Пароль:</label>
+                <input type="password" class="admin-input" id="admin-password" placeholder="Введите пароль">
+            </div>
+            <div class="admin-message" id="admin-message"></div>
+            <div class="admin-buttons">
+                <button class="admin-btn admin-login" id="admin-login-btn">Войти</button>
+                <button class="admin-btn admin-cancel" id="admin-cancel-btn">Отмена</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Админ-панель -->
+    <div class="admin-modal" id="admin-panel">
+        <div class="admin-panel">
+            <div class="modal-header">
+                <h2 class="modal-title">Админ-панель</h2>
+                <button class="close-btn" id="close-admin">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="admin-section">
+                <h3 class="admin-section-title">Управление балансом</h3>
+                <div class="admin-balance-controls">
+                    <input type="number" class="admin-balance-input" id="admin-balance-input" placeholder="Сумма m$">
+                    <button class="admin-balance-btn" id="admin-set-balance">Установить</button>
+                </div>
+                <div class="admin-balance-controls">
+                    <input type="number" class="admin-balance-input" id="admin-add-balance-input" placeholder="Добавить m$">
+                    <button class="admin-balance-btn" id="admin-add-balance">Добавить</button>
+                </div>
+            </div>
+            
+            <div class="admin-section">
+                <h3 class="admin-section-title">Быстрые действия</h3>
+                <button class="admin-action-btn" id="admin-max-balance">1M m$</button>
+                <button class="admin-action-btn" id="admin-reset-balance">Сбросить баланс</button>
+                <button class="admin-action-btn" id="admin-max-upgrades">Макс. улучшения</button>
+            </div>
+            
+            <div class="admin-message" id="admin-panel-message"></div>
+        </div>
+    </div>
+
     <div class="particles-container" id="particles"></div>
 
     <script>
@@ -1209,9 +1493,12 @@
         const statsModal = document.getElementById('stats-modal');
         const confirmModal = document.getElementById('confirm-modal');
         const rebirthModal = document.getElementById('rebirth-modal');
+        const adminModal = document.getElementById('admin-modal');
+        const adminPanel = document.getElementById('admin-panel');
         const closeSettingsBtn = document.getElementById('close-settings');
         const closeShopBtn = document.getElementById('close-shop');
         const closeStatsBtn = document.getElementById('close-stats');
+        const closeAdminBtn = document.getElementById('close-admin');
         const resetBtn = document.getElementById('reset-btn');
         const confirmOkBtn = document.getElementById('confirm-ok');
         const confirmCancelBtn = document.getElementById('confirm-cancel');
@@ -1221,6 +1508,21 @@
         const rebirthInfoElement = document.getElementById('rebirth-info');
         const autoclickerToggle = document.getElementById('autoclicker-toggle');
         const particlesToggle = document.getElementById('particles-toggle');
+
+        // Элементы админ-панели
+        const adminLoginInput = document.getElementById('admin-login');
+        const adminPasswordInput = document.getElementById('admin-password');
+        const adminLoginBtn = document.getElementById('admin-login-btn');
+        const adminCancelBtn = document.getElementById('admin-cancel-btn');
+        const adminMessage = document.getElementById('admin-message');
+        const adminBalanceInput = document.getElementById('admin-balance-input');
+        const adminAddBalanceInput = document.getElementById('admin-add-balance-input');
+        const adminSetBalanceBtn = document.getElementById('admin-set-balance');
+        const adminAddBalanceBtn = document.getElementById('admin-add-balance');
+        const adminMaxBalanceBtn = document.getElementById('admin-max-balance');
+        const adminResetBalanceBtn = document.getElementById('admin-reset-balance');
+        const adminMaxUpgradesBtn = document.getElementById('admin-max-upgrades');
+        const adminPanelMessage = document.getElementById('admin-panel-message');
 
         // Статистика
         let totalClicks = parseInt(localStorage.getItem('totalClicks')) || 0;
@@ -1361,69 +1663,36 @@
             rebirthConfirmBtn.disabled = !canRebirth;
         }
 
-        // Обработчик клика по монете
-        coinElement.addEventListener('click', (e) => {
-            // Базовый клик с учетом множителя перерождения
-            let clickValue = 1 * rebirthMultiplier;
-            
-            // Умножаем на множитель двойного клика
-            clickValue *= upgrades.doubleClick.multiplier;
-            
-            // Шанс золотого клика
-            let isGolden = false;
-            if (Math.random() < upgrades.goldenClick.chance) {
-                clickValue *= 5;
-                isGolden = true;
-                goldenClicks++;
-                localStorage.setItem('goldenClicks', goldenClicks);
+        // Функция для загрузки данных из admin.txt
+        async function loadAdminCredentials() {
+            try {
+                const response = await fetch('admin.txt');
+                if (!response.ok) {
+                    throw new Error('Файл admin.txt не найден');
+                }
+                const text = await response.text();
+                const [login, password] = text.trim().split(':');
+                return { login, password };
+            } catch (error) {
+                console.error('Ошибка загрузки admin.txt:', error);
+                // Значения по умолчанию на случай ошибки
+                return { login: 'admin', password: '12345' };
             }
-            
-            // Шанс критического удара
-            let isCritical = false;
-            if (Math.random() < upgrades.criticalStrike.chance) {
-                clickValue *= upgrades.criticalStrike.multiplier;
-                isCritical = true;
-            }
-            
-            // Увеличиваем баланс
-            balance += clickValue;
-            totalClicks++;
-            totalEarned += clickValue;
-            
-            // Сохраняем данные
-            localStorage.setItem('clickerBalance', balance);
-            localStorage.setItem('totalClicks', totalClicks);
-            localStorage.setItem('totalEarned', totalEarned);
-            
-            // Обновляем отображение
-            updateBalance();
-            
-            // Показываем значение клика на монете с особым цветом для крита
-            const clickValueElement = document.createElement('div');
-            clickValueElement.className = 'coin-click-value';
-            if (isCritical) {
-                clickValueElement.style.color = '#ff4444';
-                clickValueElement.style.textShadow = '0 0 10px #ff4444';
-                clickValueElement.textContent = `КРИТ! +${formatNumber(clickValue)}`;
+        }
+
+        // Функция для показа сообщения в админ-панели
+        function showAdminMessage(message, isError = false) {
+            adminPanelMessage.textContent = message;
+            adminPanelMessage.style.display = 'block';
+            if (isError) {
+                adminPanelMessage.classList.add('error');
             } else {
-                clickValueElement.textContent = `+${formatNumber(clickValue)}`;
+                adminPanelMessage.classList.remove('error');
             }
-            coinContainer.appendChild(clickValueElement);
-            
-            // Удаляем элемент после анимации
             setTimeout(() => {
-                clickValueElement.remove();
-            }, 1500);
-            
-            // Создаем эффект клика
-            createClickEffect(e.clientX, e.clientY);
-            
-            // Анимация монеты
-            coinElement.style.transform = 'scale(0.95) rotateY(5deg)';
-            setTimeout(() => {
-                coinElement.style.transform = '';
-            }, 100);
-        });
+                adminPanelMessage.style.display = 'none';
+            }, 3000);
+        }
 
         // Функция автокликера
         function startAutoClicker() {
@@ -1501,6 +1770,70 @@
             }
         }
 
+        // Обработчик клика по монете
+        coinElement.addEventListener('click', (e) => {
+            // Базовый клик с учетом множителя перерождения
+            let clickValue = 1 * rebirthMultiplier;
+            
+            // Умножаем на множитель двойного клика
+            clickValue *= upgrades.doubleClick.multiplier;
+            
+            // Шанс золотого клика
+            let isGolden = false;
+            if (Math.random() < upgrades.goldenClick.chance) {
+                clickValue *= 5;
+                isGolden = true;
+                goldenClicks++;
+                localStorage.setItem('goldenClicks', goldenClicks);
+            }
+            
+            // Шанс критического удара
+            let isCritical = false;
+            if (Math.random() < upgrades.criticalStrike.chance) {
+                clickValue *= upgrades.criticalStrike.multiplier;
+                isCritical = true;
+            }
+            
+            // Увеличиваем баланс
+            balance += clickValue;
+            totalClicks++;
+            totalEarned += clickValue;
+            
+            // Сохраняем данные
+            localStorage.setItem('clickerBalance', balance);
+            localStorage.setItem('totalClicks', totalClicks);
+            localStorage.setItem('totalEarned', totalEarned);
+            
+            // Обновляем отображение
+            updateBalance();
+            
+            // Показываем значение клика на монете с особым цветом для крита
+            const clickValueElement = document.createElement('div');
+            clickValueElement.className = 'coin-click-value';
+            if (isCritical) {
+                clickValueElement.style.color = '#ff4444';
+                clickValueElement.style.textShadow = '0 0 10px #ff4444';
+                clickValueElement.textContent = `КРИТ! +${formatNumber(clickValue)}`;
+            } else {
+                clickValueElement.textContent = `+${formatNumber(clickValue)}`;
+            }
+            coinContainer.appendChild(clickValueElement);
+            
+            // Удаляем элемент после анимации
+            setTimeout(() => {
+                clickValueElement.remove();
+            }, 1500);
+            
+            // Создаем эффект клика
+            createClickEffect(e.clientX, e.clientY);
+            
+            // Анимация монеты
+            coinElement.style.transform = 'scale(0.95) rotateY(5deg)';
+            setTimeout(() => {
+                coinElement.style.transform = '';
+            }, 100);
+        });
+
         // Обработчик движения мыши для эффекта наведения
         document.addEventListener('mousemove', (e) => {
             const coinRect = coinElement.getBoundingClientRect();
@@ -1551,6 +1884,10 @@
             statsModal.classList.remove('active');
         });
 
+        closeAdminBtn.addEventListener('click', () => {
+            adminPanel.classList.remove('active');
+        });
+
         // Закрытие модальных окон при клике вне их
         settingsModal.addEventListener('click', (e) => {
             if (e.target === settingsModal) {
@@ -1579,6 +1916,18 @@
         rebirthModal.addEventListener('click', (e) => {
             if (e.target === rebirthModal) {
                 rebirthModal.classList.remove('active');
+            }
+        });
+
+        adminModal.addEventListener('click', (e) => {
+            if (e.target === adminModal) {
+                adminModal.classList.remove('active');
+            }
+        });
+
+        adminPanel.addEventListener('click', (e) => {
+            if (e.target === adminPanel) {
+                adminPanel.classList.remove('active');
             }
         });
 
@@ -1660,6 +2009,104 @@
             } else {
                 particlesContainer.innerHTML = '';
             }
+        });
+
+        // Обработчики для админ-панели
+        adminLoginBtn.addEventListener('click', async () => {
+            const login = adminLoginInput.value.trim();
+            const password = adminPasswordInput.value.trim();
+            
+            if (!login || !password) {
+                adminMessage.textContent = 'Введите логин и пароль';
+                adminMessage.style.display = 'block';
+                adminMessage.classList.add('error');
+                return;
+            }
+            
+            const credentials = await loadAdminCredentials();
+            
+            if (login === credentials.login && password === credentials.password) {
+                adminModal.classList.remove('active');
+                adminPanel.classList.add('active');
+                adminLoginInput.value = '';
+                adminPasswordInput.value = '';
+                adminMessage.style.display = 'none';
+            } else {
+                adminMessage.textContent = 'Неверный логин или пароль';
+                adminMessage.style.display = 'block';
+                adminMessage.classList.add('error');
+            }
+        });
+
+        adminCancelBtn.addEventListener('click', () => {
+            adminModal.classList.remove('active');
+            adminLoginInput.value = '';
+            adminPasswordInput.value = '';
+            adminMessage.style.display = 'none';
+        });
+
+        adminSetBalanceBtn.addEventListener('click', () => {
+            const amount = parseInt(adminBalanceInput.value);
+            if (isNaN(amount) || amount < 0) {
+                showAdminMessage('Введите корректную сумму', true);
+                return;
+            }
+            
+            balance = amount;
+            localStorage.setItem('clickerBalance', balance);
+            updateBalance();
+            showAdminMessage(`Баланс установлен: ${formatNumber(amount)} m$`);
+            adminBalanceInput.value = '';
+        });
+
+        adminAddBalanceBtn.addEventListener('click', () => {
+            const amount = parseInt(adminAddBalanceInput.value);
+            if (isNaN(amount) || amount < 0) {
+                showAdminMessage('Введите корректную сумму', true);
+                return;
+            }
+            
+            balance += amount;
+            localStorage.setItem('clickerBalance', balance);
+            updateBalance();
+            showAdminMessage(`Добавлено: ${formatNumber(amount)} m$`);
+            adminAddBalanceInput.value = '';
+        });
+
+        adminMaxBalanceBtn.addEventListener('click', () => {
+            balance = 1000000;
+            localStorage.setItem('clickerBalance', balance);
+            updateBalance();
+            showAdminMessage('Баланс установлен: 1M m$');
+        });
+
+        adminResetBalanceBtn.addEventListener('click', () => {
+            balance = 0;
+            localStorage.setItem('clickerBalance', balance);
+            updateBalance();
+            showAdminMessage('Баланс сброшен');
+        });
+
+        adminMaxUpgradesBtn.addEventListener('click', () => {
+            upgrades.autoClicker.level = 10;
+            upgrades.autoClicker.autoClicks = 10;
+            upgrades.doubleClick.level = 5;
+            upgrades.doubleClick.multiplier = 6;
+            upgrades.goldenClick.level = 1;
+            upgrades.goldenClick.chance = 0.02;
+            upgrades.criticalStrike.level = 5;
+            upgrades.criticalStrike.chance = 0.15;
+            
+            localStorage.setItem('clickerUpgrades', JSON.stringify(upgrades));
+            
+            // Разблокируем автокликер
+            autoclickerToggle.disabled = false;
+            autoclickerToggle.checked = true;
+            autoclickerEnabled = true;
+            localStorage.setItem('autoclickerEnabled', true);
+            startAutoClicker();
+            
+            showAdminMessage('Все улучшения максимально прокачаны!');
         });
 
         // Функция рендера товаров в магазине
@@ -1821,6 +2268,13 @@
                 shopItemsContainer.appendChild(shopItem);
             });
         }
+
+        // Проверка URL для открытия админ-панели
+        window.addEventListener('load', () => {
+            if (window.location.pathname === '/admin' || window.location.hash === '#admin') {
+                adminModal.classList.add('active');
+            }
+        });
 
         // Инициализация
         updateBalance();
