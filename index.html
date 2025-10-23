@@ -641,6 +641,18 @@
             opacity: 0.6;
         }
 
+        .boost-cooldown {
+            background: linear-gradient(135deg, #ff6b6b, #ff5252);
+        }
+
+        .boost-active {
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+        }
+
+        .boost-active:hover:not(:disabled) {
+            background: linear-gradient(135deg, #45a049, #3d8b40);
+        }
+
         .owned-badge {
             background: #4CAF50;
             color: white;
@@ -648,6 +660,12 @@
             border-radius: 10px;
             font-size: 0.8rem;
             margin-left: 10px;
+        }
+
+        .cooldown-timer {
+            font-size: 0.8rem;
+            color: #ff6b6b;
+            margin-top: 5px;
         }
 
         /* Стили для подтверждения сброса */
@@ -1778,9 +1796,26 @@
             criticalStrike: { level: 0, cost: 300, chance: 0, multiplier: 2, maxLevel: 5 }
         };
 
+        // Бусты
+        let boosts = JSON.parse(localStorage.getItem('clickerBoosts')) || {
+            goldenRain: { active: false, cooldown: 0, duration: 30, multiplier: 3, price: 500, cooldownTime: 300 },
+            autoBoost: { active: false, cooldown: 0, duration: 60, multiplier: 2, price: 300, cooldownTime: 180 },
+            criticalStorm: { active: false, cooldown: 0, duration: 20, chance: 1, price: 400, cooldownTime: 240 },
+            luckyStrike: { active: false, cooldown: 0, duration: 45, multiplier: 2, price: 600, cooldownTime: 360 }
+        };
+
+        // Активные эффекты
+        let activeEffects = {
+            goldenRain: false,
+            autoBoost: false,
+            criticalStorm: false,
+            luckyStrike: false
+        };
+
         // Автокликер
         let autoClickInterval;
         let statsInterval;
+        let boostInterval;
 
         // Максимальное количество перерождений
         const MAX_REBIRTH_COUNT = 5;
@@ -1808,6 +1843,13 @@
                 return (num / 1000).toFixed(1) + 'k';
             }
             return num.toString();
+        }
+
+        // Функция для форматирования времени
+        function formatTime(seconds) {
+            const minutes = Math.floor(seconds / 60);
+            const secs = seconds % 60;
+            return `${minutes}:${secs.toString().padStart(2, '0')}`;
         }
 
         // Обновляем отображение баланса
@@ -1940,19 +1982,88 @@
             }, 3000);
         }
 
+        // Функция активации буста
+        function activateBoost(boostId) {
+            const boost = boosts[boostId];
+            
+            if (boost.cooldown > 0 || boost.active) return;
+            
+            if (balance >= boost.price) {
+                balance -= boost.price;
+                boost.active = true;
+                boost.cooldown = boost.cooldownTime;
+                activeEffects[boostId] = true;
+                
+                // Сохраняем данные
+                localStorage.setItem('clickerBalance', balance);
+                localStorage.setItem('clickerBoosts', JSON.stringify(boosts));
+                
+                updateBalance();
+                renderShopItems();
+                
+                // Запускаем таймер буста
+                setTimeout(() => {
+                    boost.active = false;
+                    activeEffects[boostId] = false;
+                    localStorage.setItem('clickerBoosts', JSON.stringify(boosts));
+                    renderShopItems();
+                }, boost.duration * 1000);
+            }
+        }
+
+        // Функция обновления кулдаунов
+        function updateCooldowns() {
+            let needsUpdate = false;
+            
+            for (const boostId in boosts) {
+                const boost = boosts[boostId];
+                if (boost.cooldown > 0 && !boost.active) {
+                    boost.cooldown--;
+                    needsUpdate = true;
+                }
+            }
+            
+            if (needsUpdate) {
+                localStorage.setItem('clickerBoosts', JSON.stringify(boosts));
+                if (shopModal.classList.contains('active') && boostsTab.classList.contains('active')) {
+                    renderShopItems();
+                }
+            }
+        }
+
         // Функция автокликера
         function startAutoClicker() {
             if (autoClickInterval) clearInterval(autoClickInterval);
             
             if (!autoclickerEnabled || upgrades.autoClicker.level === 0) return;
             
+            let autoClickMultiplier = 1;
+            if (activeEffects.autoBoost) {
+                autoClickMultiplier = boosts.autoBoost.multiplier;
+            }
+            
             autoClickInterval = setInterval(() => {
                 if (upgrades.autoClicker.autoClicks > 0) {
-                    let autoClickValue = upgrades.autoClicker.autoClicks * upgrades.doubleClick.multiplier * rebirthMultiplier;
+                    let autoClickValue = upgrades.autoClicker.autoClicks * upgrades.doubleClick.multiplier * rebirthMultiplier * autoClickMultiplier;
                     
                     // Шанс критического удара для автокликера
-                    if (Math.random() < upgrades.criticalStrike.chance) {
+                    let critChance = upgrades.criticalStrike.chance;
+                    if (activeEffects.criticalStorm) {
+                        critChance = boosts.criticalStorm.chance;
+                    }
+                    
+                    if (Math.random() < critChance) {
                         autoClickValue *= upgrades.criticalStrike.multiplier;
+                    }
+                    
+                    // Умножаем на эффект золотого дождя
+                    if (activeEffects.goldenRain) {
+                        autoClickValue *= boosts.goldenRain.multiplier;
+                    }
+                    
+                    // Умножаем на эффект удачного удара
+                    if (activeEffects.luckyStrike) {
+                        autoClickValue *= boosts.luckyStrike.multiplier;
                     }
                     
                     balance += autoClickValue;
@@ -1992,6 +2103,21 @@
                     criticalStrike: { level: 0, cost: 300, chance: 0, multiplier: 2, maxLevel: 5 }
                 };
                 
+                // Сбрасываем бусты
+                boosts = {
+                    goldenRain: { active: false, cooldown: 0, duration: 30, multiplier: 3, price: 500, cooldownTime: 300 },
+                    autoBoost: { active: false, cooldown: 0, duration: 60, multiplier: 2, price: 300, cooldownTime: 180 },
+                    criticalStorm: { active: false, cooldown: 0, duration: 20, chance: 1, price: 400, cooldownTime: 240 },
+                    luckyStrike: { active: false, cooldown: 0, duration: 45, multiplier: 2, price: 600, cooldownTime: 360 }
+                };
+                
+                activeEffects = {
+                    goldenRain: false,
+                    autoBoost: false,
+                    criticalStorm: false,
+                    luckyStrike: false
+                };
+                
                 // Сбрасываем настройки автокликера
                 autoclickerEnabled = false;
                 autoclickerToggle.checked = false;
@@ -2001,6 +2127,7 @@
                 // Сохраняем данные
                 localStorage.setItem('clickerBalance', balance);
                 localStorage.setItem('clickerUpgrades', JSON.stringify(upgrades));
+                localStorage.setItem('clickerBoosts', JSON.stringify(boosts));
                 localStorage.setItem('rebirthCount', rebirthCount);
                 localStorage.setItem('rebirthMultiplier', rebirthMultiplier);
                 localStorage.setItem('priceMultiplier', priceMultiplier);
@@ -2036,10 +2163,25 @@
             }
             
             // Шанс критического удара
+            let critChance = upgrades.criticalStrike.chance;
+            if (activeEffects.criticalStorm) {
+                critChance = boosts.criticalStorm.chance;
+            }
+            
             let isCritical = false;
-            if (Math.random() < upgrades.criticalStrike.chance) {
+            if (Math.random() < critChance) {
                 clickValue *= upgrades.criticalStrike.multiplier;
                 isCritical = true;
+            }
+            
+            // Умножаем на эффект золотого дождя
+            if (activeEffects.goldenRain) {
+                clickValue *= boosts.goldenRain.multiplier;
+            }
+            
+            // Умножаем на эффект удачного удара
+            if (activeEffects.luckyStrike) {
+                clickValue *= boosts.luckyStrike.multiplier;
             }
             
             // Увеличиваем баланс
@@ -2062,6 +2204,10 @@
                 clickValueElement.style.color = '#ff4444';
                 clickValueElement.style.textShadow = '0 0 10px #ff4444';
                 clickValueElement.textContent = `КРИТ! +${formatNumber(clickValue)}`;
+            } else if (isGolden) {
+                clickValueElement.style.color = '#ffd700';
+                clickValueElement.style.textShadow = '0 0 10px #ffd700';
+                clickValueElement.textContent = `ЗОЛОТО! +${formatNumber(clickValue)}`;
             } else {
                 clickValueElement.textContent = `+${formatNumber(clickValue)}`;
             }
@@ -2223,6 +2369,18 @@
                 goldenClick: { level: 0, cost: 200, chance: 0, maxLevel: 1 },
                 criticalStrike: { level: 0, cost: 300, chance: 0, multiplier: 2, maxLevel: 5 }
             };
+            boosts = {
+                goldenRain: { active: false, cooldown: 0, duration: 30, multiplier: 3, price: 500, cooldownTime: 300 },
+                autoBoost: { active: false, cooldown: 0, duration: 60, multiplier: 2, price: 300, cooldownTime: 180 },
+                criticalStorm: { active: false, cooldown: 0, duration: 20, chance: 1, price: 400, cooldownTime: 240 },
+                luckyStrike: { active: false, cooldown: 0, duration: 45, multiplier: 2, price: 600, cooldownTime: 360 }
+            };
+            activeEffects = {
+                goldenRain: false,
+                autoBoost: false,
+                criticalStorm: false,
+                luckyStrike: false
+            };
             autoclickerEnabled = false;
             autoclickerToggle.checked = false;
             autoclickerToggle.disabled = true;
@@ -2235,6 +2393,7 @@
             localStorage.setItem('rebirthMultiplier', rebirthMultiplier);
             localStorage.setItem('priceMultiplier', priceMultiplier);
             localStorage.setItem('clickerUpgrades', JSON.stringify(upgrades));
+            localStorage.setItem('clickerBoosts', JSON.stringify(boosts));
             localStorage.setItem('autoclickerEnabled', false);
             updateBalance();
             startAutoClicker();
@@ -2542,21 +2701,119 @@
                     shopItemsContainer.appendChild(shopItem);
                 });
             } else {
-                // Вкладка "Бусты" - заглушка
-                const placeholder = document.createElement('div');
-                placeholder.className = 'shop-item';
-                placeholder.innerHTML = `
-                    <div class="shop-item-info">
-                        <div class="shop-item-title">Бусты скоро появятся!</div>
-                        <div class="shop-item-description">В разработке...</div>
-                        <div class="shop-item-effect">Эффект: Временно увеличивает доход</div>
-                        <div class="shop-item-price">Цена: ??? m$</div>
-                    </div>
-                    <button class="shop-item-btn" disabled>
-                        Скоро
-                    </button>
-                `;
-                shopItemsContainer.appendChild(placeholder);
+                // Вкладка "Бусты"
+                const boostItems = [
+                    {
+                        id: 'goldenRain',
+                        title: 'Золотой дождь',
+                        description: 'Временное увеличение дохода от кликов',
+                        price: boosts.goldenRain.price,
+                        effect: `x${boosts.goldenRain.multiplier} к доходу на ${boosts.goldenRain.duration} сек`,
+                        getButtonText: function() {
+                            if (boosts.goldenRain.active) return 'Активен';
+                            if (boosts.goldenRain.cooldown > 0) return `Перезарядка: ${formatTime(boosts.goldenRain.cooldown)}`;
+                            return 'Активировать';
+                        },
+                        getButtonClass: function() {
+                            if (boosts.goldenRain.active) return 'boost-active';
+                            if (boosts.goldenRain.cooldown > 0) return 'boost-cooldown';
+                            return '';
+                        },
+                        canBuy: function() {
+                            return balance >= this.price && !boosts.goldenRain.active && boosts.goldenRain.cooldown === 0;
+                        }
+                    },
+                    {
+                        id: 'autoBoost',
+                        title: 'Авто-буст',
+                        description: 'Увеличивает скорость автокликера',
+                        price: boosts.autoBoost.price,
+                        effect: `x${boosts.autoBoost.multiplier} к автокликеру на ${boosts.autoBoost.duration} сек`,
+                        getButtonText: function() {
+                            if (boosts.autoBoost.active) return 'Активен';
+                            if (boosts.autoBoost.cooldown > 0) return `Перезарядка: ${formatTime(boosts.autoBoost.cooldown)}`;
+                            return 'Активировать';
+                        },
+                        getButtonClass: function() {
+                            if (boosts.autoBoost.active) return 'boost-active';
+                            if (boosts.autoBoost.cooldown > 0) return 'boost-cooldown';
+                            return '';
+                        },
+                        canBuy: function() {
+                            return balance >= this.price && !boosts.autoBoost.active && boosts.autoBoost.cooldown === 0;
+                        }
+                    },
+                    {
+                        id: 'criticalStorm',
+                        title: 'Критический шторм',
+                        description: 'Гарантированные критические удары',
+                        price: boosts.criticalStorm.price,
+                        effect: `100% шанс крита на ${boosts.criticalStorm.duration} сек`,
+                        getButtonText: function() {
+                            if (boosts.criticalStorm.active) return 'Активен';
+                            if (boosts.criticalStorm.cooldown > 0) return `Перезарядка: ${formatTime(boosts.criticalStorm.cooldown)}`;
+                            return 'Активировать';
+                        },
+                        getButtonClass: function() {
+                            if (boosts.criticalStorm.active) return 'boost-active';
+                            if (boosts.criticalStorm.cooldown > 0) return 'boost-cooldown';
+                            return '';
+                        },
+                        canBuy: function() {
+                            return balance >= this.price && !boosts.criticalStorm.active && boosts.criticalStorm.cooldown === 0;
+                        }
+                    },
+                    {
+                        id: 'luckyStrike',
+                        title: 'Удачный удар',
+                        description: 'Увеличивает базовый доход от кликов',
+                        price: boosts.luckyStrike.price,
+                        effect: `x${boosts.luckyStrike.multiplier} к базовому доходу на ${boosts.luckyStrike.duration} сек`,
+                        getButtonText: function() {
+                            if (boosts.luckyStrike.active) return 'Активен';
+                            if (boosts.luckyStrike.cooldown > 0) return `Перезарядка: ${formatTime(boosts.luckyStrike.cooldown)}`;
+                            return 'Активировать';
+                        },
+                        getButtonClass: function() {
+                            if (boosts.luckyStrike.active) return 'boost-active';
+                            if (boosts.luckyStrike.cooldown > 0) return 'boost-cooldown';
+                            return '';
+                        },
+                        canBuy: function() {
+                            return balance >= this.price && !boosts.luckyStrike.active && boosts.luckyStrike.cooldown === 0;
+                        }
+                    }
+                ];
+                
+                boostItems.forEach(item => {
+                    const shopItem = document.createElement('div');
+                    shopItem.className = 'shop-item';
+                    
+                    const canBuy = item.canBuy();
+                    
+                    shopItem.innerHTML = `
+                        <div class="shop-item-info">
+                            <div class="shop-item-title">${item.title}</div>
+                            <div class="shop-item-description">${item.description}</div>
+                            <div class="shop-item-effect">Эффект: ${item.effect}</div>
+                            <div class="shop-item-price">Цена: ${formatNumber(item.price)} m$</div>
+                            ${boosts[item.id].cooldown > 0 && !boosts[item.id].active ? 
+                                `<div class="cooldown-timer">Перезарядка: ${formatTime(boosts[item.id].cooldown)}</div>` : ''}
+                        </div>
+                        <button class="shop-item-btn ${item.getButtonClass()}" ${!canBuy ? 'disabled' : ''}>
+                            ${item.getButtonText()}
+                        </button>
+                    `;
+                    
+                    const buyBtn = shopItem.querySelector('.shop-item-btn');
+                    if (canBuy) {
+                        buyBtn.addEventListener('click', () => {
+                            activateBoost(item.id);
+                        });
+                    }
+                    
+                    shopItemsContainer.appendChild(shopItem);
+                });
             }
         }
 
@@ -2577,6 +2834,11 @@
             if (statsModal.classList.contains('active')) {
                 updateStats();
             }
+        }, 1000);
+
+        // Запускаем обновление кулдаунов
+        boostInterval = setInterval(() => {
+            updateCooldowns();
         }, 1000);
 
         // Сохраняем время игры при закрытии
