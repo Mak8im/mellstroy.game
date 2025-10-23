@@ -414,6 +414,35 @@
             color: #ff6b6b;
         }
 
+        .shop-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .shop-tab {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+        }
+
+        .shop-tab.active {
+            background: linear-gradient(135deg, #4facfe, #00f2fe);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .shop-tab:hover:not(.active) {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
         .settings-section {
             margin-bottom: 20px;
         }
@@ -1452,10 +1481,15 @@
     <div class="modal" id="shop-modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2 class="modal-title">Магазин улучшений</h2>
+                <h2 class="modal-title">Магазин</h2>
                 <button class="close-btn" id="close-shop">
                     <i class="fas fa-times"></i>
                 </button>
+            </div>
+            
+            <div class="shop-tabs">
+                <button class="shop-tab active" id="upgrades-tab">Улучшения</button>
+                <button class="shop-tab" id="boosts-tab">Бусты</button>
             </div>
             
             <div class="shop-items" id="shop-items">
@@ -1601,14 +1635,6 @@
             <p class="success-message">Вы достигли нового уровня силы и возможностей!</p>
             <div class="success-details">
                 <div class="success-detail">
-                    <span>Старый множитель:</span>
-                    <span id="old-multiplier">x1</span>
-                </div>
-                <div class="success-detail">
-                    <span>Новый множитель:</span>
-                    <span class="success-bonus" id="success-new-multiplier">x2</span>
-                </div>
-                <div class="success-detail">
                     <span>Всего перерождений:</span>
                     <span class="success-bonus" id="success-rebirth-count">1</span>
                 </div>
@@ -1711,6 +1737,8 @@
         const rebirthInfoElement = document.getElementById('rebirth-info');
         const autoclickerToggle = document.getElementById('autoclicker-toggle');
         const particlesToggle = document.getElementById('particles-toggle');
+        const upgradesTab = document.getElementById('upgrades-tab');
+        const boostsTab = document.getElementById('boosts-tab');
 
         // Элементы админ-панели
         const adminLoginInput = document.getElementById('admin-login');
@@ -1753,6 +1781,9 @@
         // Автокликер
         let autoClickInterval;
         let statsInterval;
+
+        // Максимальное количество перерождений
+        const MAX_REBIRTH_COUNT = 5;
 
         // Функция для расчета стоимости перерождения
         function getRebirthCost() {
@@ -1855,24 +1886,25 @@
         function updateRebirthModal() {
             const rebirthCost = getRebirthCost();
             const newMultiplier = getNewMultiplier();
-            const canRebirth = balance >= rebirthCost;
+            const canRebirth = balance >= rebirthCost && rebirthCount < MAX_REBIRTH_COUNT;
             
             document.getElementById('current-balance').textContent = formatNumber(balance) + ' m$';
             document.getElementById('rebirth-cost').textContent = formatNumber(rebirthCost) + ' m$';
-            document.getElementById('rebirth-available').textContent = canRebirth ? 'Да' : 'Нет';
+            document.getElementById('rebirth-available').textContent = canRebirth ? 'Да' : (rebirthCount >= MAX_REBIRTH_COUNT ? 'Максимум достигнут' : 'Нет');
             document.getElementById('rebirth-available').className = canRebirth ? 'rebirth-available' : 'rebirth-unavailable';
             document.getElementById('new-multiplier').textContent = 'x' + newMultiplier;
             
             rebirthConfirmBtn.disabled = !canRebirth;
+            
+            if (rebirthCount >= MAX_REBIRTH_COUNT) {
+                rebirthConfirmBtn.textContent = 'Максимум достигнут';
+            }
         }
 
         // Функция для обновления окна успеха перерождения
         function updateSuccessModal() {
             const rebirthCost = getRebirthCost();
-            const newMultiplier = getNewMultiplier();
             
-            document.getElementById('old-multiplier').textContent = 'x' + (rebirthMultiplier / 2);
-            document.getElementById('success-new-multiplier').textContent = 'x' + newMultiplier;
             document.getElementById('success-rebirth-count').textContent = rebirthCount;
             document.getElementById('next-rebirth-cost').textContent = formatNumber(rebirthCost) + ' m$';
         }
@@ -1945,10 +1977,7 @@
         function performRebirth() {
             const rebirthCost = getRebirthCost();
             
-            if (balance >= rebirthCost) {
-                // Сохраняем старый множитель для отображения в окне успеха
-                const oldMultiplier = rebirthMultiplier;
-                
+            if (balance >= rebirthCost && rebirthCount < MAX_REBIRTH_COUNT) {
                 // Увеличиваем счетчик перерождений
                 rebirthCount++;
                 rebirthMultiplier = getNewMultiplier();
@@ -2088,6 +2117,19 @@
         rebirthBtn.addEventListener('click', () => {
             rebirthModal.classList.add('active');
             updateRebirthModal();
+        });
+
+        // Переключение вкладок в магазине
+        upgradesTab.addEventListener('click', () => {
+            upgradesTab.classList.add('active');
+            boostsTab.classList.remove('active');
+            renderShopItems();
+        });
+
+        boostsTab.addEventListener('click', () => {
+            boostsTab.classList.add('active');
+            upgradesTab.classList.remove('active');
+            renderShopItems();
         });
 
         // Закрытие модальных окон
@@ -2342,160 +2384,180 @@
         function renderShopItems() {
             shopItemsContainer.innerHTML = '';
             
-            const shopItems = [
-                {
-                    id: 'autoClicker',
-                    title: 'Авто-кликер',
-                    description: 'Автоматически кликает за вас',
-                    baseCost: 50,
-                    level: upgrades.autoClicker.level,
-                    maxLevel: 10,
-                    getCost: function() {
-                        return Math.floor(this.baseCost * Math.pow(1.5, this.level) * priceMultiplier);
-                    },
-                    effect: function() {
-                        return `+${this.level} кликов/сек`;
-                    },
-                    buy: function() {
-                        const cost = this.getCost();
-                        if (balance >= cost && this.level < this.maxLevel) {
-                            balance -= cost;
-                            this.level++;
-                            upgrades.autoClicker.level = this.level;
-                            upgrades.autoClicker.autoClicks = this.level;
-                            upgrades.autoClicker.cost = this.getCost();
-                            localStorage.setItem('clickerBalance', balance);
-                            localStorage.setItem('clickerUpgrades', JSON.stringify(upgrades));
-                            updateBalance();
-                            
-                            // Разблокируем переключатель автокликера при покупке первого уровня
-                            if (this.level === 1) {
-                                autoclickerToggle.disabled = false;
-                                autoclickerToggle.checked = true;
-                                autoclickerEnabled = true;
-                                localStorage.setItem('autoclickerEnabled', true);
-                            }
-                            
-                            startAutoClicker();
-                            renderShopItems();
-                        }
-                    }
-                },
-                {
-                    id: 'doubleClick',
-                    title: 'Усилитель кликов',
-                    description: 'Увеличивает силу каждого клика',
-                    baseCost: 100,
-                    level: upgrades.doubleClick.level,
-                    maxLevel: 5,
-                    getCost: function() {
-                        return Math.floor(this.baseCost * Math.pow(2, this.level) * priceMultiplier);
-                    },
-                    effect: function() {
-                        return `x${1 + this.level} к кликам`;
-                    },
-                    buy: function() {
-                        const cost = this.getCost();
-                        if (balance >= cost && this.level < this.maxLevel) {
-                            balance -= cost;
-                            this.level++;
-                            upgrades.doubleClick.level = this.level;
-                            upgrades.doubleClick.multiplier = 1 + this.level;
-                            upgrades.doubleClick.cost = this.getCost();
-                            localStorage.setItem('clickerBalance', balance);
-                            localStorage.setItem('clickerUpgrades', JSON.stringify(upgrades));
-                            updateBalance();
-                            renderShopItems();
-                        }
-                    }
-                },
-                {
-                    id: 'goldenClick',
-                    title: 'Золотой клик',
-                    description: 'Шанс получить 5x монет за клик',
-                    baseCost: 200,
-                    level: upgrades.goldenClick.level,
-                    maxLevel: 1,
-                    getCost: function() {
-                        return Math.floor(this.baseCost * priceMultiplier);
-                    },
-                    effect: function() {
-                        return `${2}% шанс`;
-                    },
-                    buy: function() {
-                        const cost = this.getCost();
-                        if (balance >= cost && this.level < this.maxLevel) {
-                            balance -= cost;
-                            this.level++;
-                            upgrades.goldenClick.level = this.level;
-                            upgrades.goldenClick.chance = 0.02; // 2% шанс
-                            upgrades.goldenClick.cost = this.getCost();
-                            localStorage.setItem('clickerBalance', balance);
-                            localStorage.setItem('clickerUpgrades', JSON.stringify(upgrades));
-                            updateBalance();
-                            renderShopItems();
-                        }
-                    }
-                },
-                {
-                    id: 'criticalStrike',
-                    title: 'Критический удар',
-                    description: 'Шанс нанести критический удар с множителем x2',
-                    baseCost: 300,
-                    level: upgrades.criticalStrike.level,
-                    maxLevel: 5,
-                    getCost: function() {
-                        return Math.floor(this.baseCost * Math.pow(1.8, this.level) * priceMultiplier);
-                    },
-                    effect: function() {
-                        return `${this.level * 3}% шанс крита x2`;
-                    },
-                    buy: function() {
-                        const cost = this.getCost();
-                        if (balance >= cost && this.level < this.maxLevel) {
-                            balance -= cost;
-                            this.level++;
-                            upgrades.criticalStrike.level = this.level;
-                            upgrades.criticalStrike.chance = this.level * 0.03; // 3% за уровень
-                            upgrades.criticalStrike.multiplier = 2;
-                            upgrades.criticalStrike.cost = this.getCost();
-                            localStorage.setItem('clickerBalance', balance);
-                            localStorage.setItem('clickerUpgrades', JSON.stringify(upgrades));
-                            updateBalance();
-                            renderShopItems();
-                        }
-                    }
-                }
-            ];
+            const isUpgradesTab = upgradesTab.classList.contains('active');
             
-            shopItems.forEach(item => {
-                const shopItem = document.createElement('div');
-                shopItem.className = 'shop-item';
+            if (isUpgradesTab) {
+                const shopItems = [
+                    {
+                        id: 'autoClicker',
+                        title: 'Авто-кликер',
+                        description: 'Автоматически кликает за вас',
+                        baseCost: 50,
+                        level: upgrades.autoClicker.level,
+                        maxLevel: 10,
+                        getCost: function() {
+                            return Math.floor(this.baseCost * Math.pow(1.5, this.level) * priceMultiplier);
+                        },
+                        effect: function() {
+                            return `+${this.level} кликов/сек`;
+                        },
+                        buy: function() {
+                            const cost = this.getCost();
+                            if (balance >= cost && this.level < this.maxLevel) {
+                                balance -= cost;
+                                this.level++;
+                                upgrades.autoClicker.level = this.level;
+                                upgrades.autoClicker.autoClicks = this.level;
+                                upgrades.autoClicker.cost = this.getCost();
+                                localStorage.setItem('clickerBalance', balance);
+                                localStorage.setItem('clickerUpgrades', JSON.stringify(upgrades));
+                                updateBalance();
+                                
+                                // Разблокируем переключатель автокликера при покупке первого уровня
+                                if (this.level === 1) {
+                                    autoclickerToggle.disabled = false;
+                                    autoclickerToggle.checked = true;
+                                    autoclickerEnabled = true;
+                                    localStorage.setItem('autoclickerEnabled', true);
+                                }
+                                
+                                startAutoClicker();
+                                renderShopItems();
+                            }
+                        }
+                    },
+                    {
+                        id: 'doubleClick',
+                        title: 'Усилитель кликов',
+                        description: 'Увеличивает силу каждого клика',
+                        baseCost: 100,
+                        level: upgrades.doubleClick.level,
+                        maxLevel: 5,
+                        getCost: function() {
+                            return Math.floor(this.baseCost * Math.pow(2, this.level) * priceMultiplier);
+                        },
+                        effect: function() {
+                            return `x${1 + this.level} к кликам`;
+                        },
+                        buy: function() {
+                            const cost = this.getCost();
+                            if (balance >= cost && this.level < this.maxLevel) {
+                                balance -= cost;
+                                this.level++;
+                                upgrades.doubleClick.level = this.level;
+                                upgrades.doubleClick.multiplier = 1 + this.level;
+                                upgrades.doubleClick.cost = this.getCost();
+                                localStorage.setItem('clickerBalance', balance);
+                                localStorage.setItem('clickerUpgrades', JSON.stringify(upgrades));
+                                updateBalance();
+                                renderShopItems();
+                            }
+                        }
+                    },
+                    {
+                        id: 'goldenClick',
+                        title: 'Золотой клик',
+                        description: 'Шанс получить 5x монет за клик',
+                        baseCost: 200,
+                        level: upgrades.goldenClick.level,
+                        maxLevel: 1,
+                        getCost: function() {
+                            return Math.floor(this.baseCost * priceMultiplier);
+                        },
+                        effect: function() {
+                            return `${2}% шанс`;
+                        },
+                        buy: function() {
+                            const cost = this.getCost();
+                            if (balance >= cost && this.level < this.maxLevel) {
+                                balance -= cost;
+                                this.level++;
+                                upgrades.goldenClick.level = this.level;
+                                upgrades.goldenClick.chance = 0.02; // 2% шанс
+                                upgrades.goldenClick.cost = this.getCost();
+                                localStorage.setItem('clickerBalance', balance);
+                                localStorage.setItem('clickerUpgrades', JSON.stringify(upgrades));
+                                updateBalance();
+                                renderShopItems();
+                            }
+                        }
+                    },
+                    {
+                        id: 'criticalStrike',
+                        title: 'Критический удар',
+                        description: 'Шанс нанести критический удар с множителем x2',
+                        baseCost: 300,
+                        level: upgrades.criticalStrike.level,
+                        maxLevel: 5,
+                        getCost: function() {
+                            return Math.floor(this.baseCost * Math.pow(1.8, this.level) * priceMultiplier);
+                        },
+                        effect: function() {
+                            return `${this.level * 3}% шанс крита x2`;
+                        },
+                        buy: function() {
+                            const cost = this.getCost();
+                            if (balance >= cost && this.level < this.maxLevel) {
+                                balance -= cost;
+                                this.level++;
+                                upgrades.criticalStrike.level = this.level;
+                                upgrades.criticalStrike.chance = this.level * 0.03; // 3% за уровень
+                                upgrades.criticalStrike.multiplier = 2;
+                                upgrades.criticalStrike.cost = this.getCost();
+                                localStorage.setItem('clickerBalance', balance);
+                                localStorage.setItem('clickerUpgrades', JSON.stringify(upgrades));
+                                updateBalance();
+                                renderShopItems();
+                            }
+                        }
+                    }
+                ];
                 
-                const cost = item.getCost();
-                const canBuy = balance >= cost && item.level < item.maxLevel;
-                
-                shopItem.innerHTML = `
+                shopItems.forEach(item => {
+                    const shopItem = document.createElement('div');
+                    shopItem.className = 'shop-item';
+                    
+                    const cost = item.getCost();
+                    const canBuy = balance >= cost && item.level < item.maxLevel;
+                    
+                    shopItem.innerHTML = `
+                        <div class="shop-item-info">
+                            <div class="shop-item-title">${item.title} ${item.level > 0 ? `<span class="owned-badge">Ур. ${item.level}</span>` : ''}</div>
+                            <div class="shop-item-description">${item.description}</div>
+                            <div class="shop-item-effect">Эффект: ${item.effect()}</div>
+                            <div class="shop-item-price">Цена: ${formatNumber(cost)} m$</div>
+                        </div>
+                        <button class="shop-item-btn" ${!canBuy ? 'disabled' : ''}>
+                            ${item.level >= item.maxLevel ? 'Куплено' : 'Купить'}
+                        </button>
+                    `;
+                    
+                    const buyBtn = shopItem.querySelector('.shop-item-btn');
+                    if (item.level < item.maxLevel) {
+                        buyBtn.addEventListener('click', () => {
+                            item.buy();
+                        });
+                    }
+                    
+                    shopItemsContainer.appendChild(shopItem);
+                });
+            } else {
+                // Вкладка "Бусты" - заглушка
+                const placeholder = document.createElement('div');
+                placeholder.className = 'shop-item';
+                placeholder.innerHTML = `
                     <div class="shop-item-info">
-                        <div class="shop-item-title">${item.title} ${item.level > 0 ? `<span class="owned-badge">Ур. ${item.level}</span>` : ''}</div>
-                        <div class="shop-item-description">${item.description}</div>
-                        <div class="shop-item-effect">Эффект: ${item.effect()}</div>
-                        <div class="shop-item-price">Цена: ${formatNumber(cost)} m$</div>
+                        <div class="shop-item-title">Бусты скоро появятся!</div>
+                        <div class="shop-item-description">В разработке...</div>
+                        <div class="shop-item-effect">Эффект: Временно увеличивает доход</div>
+                        <div class="shop-item-price">Цена: ??? m$</div>
                     </div>
-                    <button class="shop-item-btn" ${!canBuy ? 'disabled' : ''}>
-                        ${item.level >= item.maxLevel ? 'Куплено' : 'Купить'}
+                    <button class="shop-item-btn" disabled>
+                        Скоро
                     </button>
                 `;
-                
-                const buyBtn = shopItem.querySelector('.shop-item-btn');
-                if (item.level < item.maxLevel) {
-                    buyBtn.addEventListener('click', () => {
-                        item.buy();
-                    });
-                }
-                
-                shopItemsContainer.appendChild(shopItem);
-            });
+                shopItemsContainer.appendChild(placeholder);
+            }
         }
 
         // Проверка URL для открытия админ-панели
